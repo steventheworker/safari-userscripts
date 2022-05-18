@@ -3,7 +3,9 @@ steven's userscripts
 safari specific
 
 -   AutoScroll.user.js (middle mouse scroll click drag wheel)
--   mobile keyboard.user.js (mobile virtual keyboard shortcuts, desktop virtual status bar (eg: Command+/))
+-   mobile keyboard.user.js (mobile virtual keyboard shortcuts)
+    -   three finger tap on any page to trigger a shortcut like on desktop
+-   desktop virtual status bar (eg: Command+/)) (helps with Dock Exposé (sometimes the status bar is treated as a window!))
 -   Instagram - require double escape key to run default escape (prevents exiting fullscreen mode when closing popup picture view)
 
 other features:
@@ -43,3 +45,7 @@ TikTok
 
 -   (mobile) make it usable while logged out
 -   export your likes using yt-dlp enter “javascript:dl()” in address bar once you’ve scrolled to the bottom
+
+&nbsp;
+
+Protip: T(op) N(ew).... means you can sort by New/Old/etc. by doing shift + the first letter (eg: shift+Y on google.com = sort by year)
