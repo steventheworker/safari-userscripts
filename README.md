@@ -13,17 +13,16 @@ other features:
 -   pagination with arrow keys (big sites I use: E-Commerce, Google, etc.)
 -   delete accept cookies popup (Currently only for programming websites (eg: stackoverflow))
 -   autofocus text inputs (with / ) and blur with escape key
--   search engines (bing, google) (sort by hotkeys (examples below))
 -   scrolling with keys: wsik (aka the home rows: wasd, ijkl) (ad jl usually do something too)
 -   social media (instagram, reddit, tiktok, youtube, yelp)
 
 # (Domain Specific) Userscripts features:
 
-Google / Bing
+Google / Bing / Search Engines
 
 -   sort search results by H(our) D(ay) M(onth) Y(ear)
 -   cmd+enter on search result = open in new tab
--   search by sites (eg: R(site:reddit.com) Q(site:quora.com))
+-   search by sites (eg: R(site:reddit.com) Q(site:quora.com) --defined in config.user.js as "site_dict")
 
 Reddit
 
