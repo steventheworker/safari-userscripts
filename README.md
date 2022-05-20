@@ -22,7 +22,7 @@ Google / Bing / Search Engines
 
 -   sort search results by H(our) D(ay) M(onth) Y(ear) (ie: Shift + Y to sort by Year)
 -   cmd+enter on search result = open in new tab
--   search by sites (eg: R(site:reddit.com) Q(site:quora.com) --defined in config.user.js as "site_dict")
+-   search by sites (eg: R(site:reddit.com) Q(site:quora.com), etc. --defined in config.user.js as "site_dict")
 
 Reddit
 
