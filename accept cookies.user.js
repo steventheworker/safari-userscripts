@@ -22,5 +22,6 @@ const jsConsentBannerMatches = {
 	"use strict";
 
 	// remove accept cookies popup
-	document.querySelector(".js-consent-banner").remove();
+	document.getElementById("onetrust-consent-sdk")?.remove();
+	document.getElementsByClassName("js-consent-banner")[0]?.remove();
 })();

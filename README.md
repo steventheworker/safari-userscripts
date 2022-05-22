@@ -49,7 +49,3 @@ TikTok
 
 -   (mobile) make it usable while logged out
 -   export your likes using yt-dlp enter “javascript:dl()” in address bar once you’ve scrolled to the bottom
-
-&nbsp;
-
-Protip: T(op) N(ew).... means you can sort by New/Old/etc. by doing shift + the first letter (eg: shift+Y on google.com = sort by year)
