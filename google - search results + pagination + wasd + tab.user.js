@@ -10,8 +10,6 @@
 // ==/UserScript==
 
 //globals
-window.win = window;
-window.bod = doc.body;
 let isMobile = false;
 
 //helper fns

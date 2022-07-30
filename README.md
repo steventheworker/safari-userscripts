@@ -35,6 +35,8 @@ Instagram
 
 YouTube
 
+-   [] = increase/decrease playback rate
+-   Increase commenter profile picture size
 -   scroll with i k w s
 -   cmd+enter on YouTube search input = open query in new tab
 -   Sort search results by H(our) T(oday) W(eek) M(onth) Y(ear) R(ating) U(pload Date) V(iew Count)

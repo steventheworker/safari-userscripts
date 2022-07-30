@@ -29,10 +29,6 @@ function addStyleSheet() {
 
 //globals
 let mouseDown;
-const doc = document,
-	win = window,
-	bod = doc.body;
-win.doc = doc;
 (function () {
 	"use strict";
 	addStyleSheet();
@@ -104,5 +100,11 @@ function addListeners(btn) {
 		btn.style.display = "block";
 		btn.style.top = e.pageY - 50 + "px";
 		btn.style.left = e.pageX + "px";
+	});
+
+	//parent events
+	if (win.top === window) return;
+	win.top.addEventListener("keypress", function (e) {
+		if (e.key === "k" && e.metaKey) markAsRead();
 	});
 }

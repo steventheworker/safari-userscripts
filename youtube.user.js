@@ -20,8 +20,20 @@ function YTPlayer() {
 		doc.getElementsByClassName("html5-video-player")[0]
 	);
 }
+let areButtonsGone = false;
+function removeButtons() {
+	if (areButtonsGone) return;
+	areButtonsGone = true;
+	// auto disable & remove autoplay button
+	const btn = doc.querySelector(".ytp-right-controls button");
+	if (btn.title.endsWith("on")) btn.click();
+	btn.remove();
+	// auto remove playnext button
+	doc.querySelector(".ytp-play-button").nextSibling.remove();
+}
 function onMediaLoad() {
 	if (win.location.pathname !== "/watch") return;
+	removeButtons();
 	getcommentsbreakpoint();
 	const newVidID = getVidID();
 	if (newVidID === vID) return;
@@ -249,7 +261,7 @@ function ListenEvents() {
 				if (e.key === "i") e.stopImmediatePropagation();
 			}
 			if (e.key === "a") triggerKeyDown("LeftArrow"); //map to rewind
-			if (e.key === "s" || e.key === "k") {
+			if ((e.key === "s" || e.key === "k") && !e.metaKey) {
 				if (e.key === "k") e.stopImmediatePropagation();
 				win.scroll({
 					left: 0,
@@ -436,9 +448,6 @@ function shouldMainRun() {
 }
 
 //init
-const doc = document,
-	win = window;
-win.doc = doc;
 function mainFn() {
 	//init, runs once (ever) on first load
 	if (!shouldMainRun()) return;
@@ -452,7 +461,11 @@ function waitForEls() {
 	);
 }
 
+function commonInit() {
+	console.log("userscript has been loaded. 👩🏿‍💻");
+}
 function mobileInit() {
+	if (commonInit() === false) return;
 	function checkOpenYoutubeBanner() {
 		if (window.scrollY > 0) return;
 		window.scroll(0, 65); //hide top banner (open in youtube)
@@ -476,8 +489,8 @@ function mobileInit() {
 	setTimeout(checkOpenYoutubeBanner, 500);
 }
 function desktopInit() {
+	if (commonInit() === false) return;
 	if (window.location.pathname === "/live_chat") return; //don't run userscript in liveChat iframe
-	console.log("userscript has been loaded. 👩🏿‍💻");
 	mainFn();
 	//check if finished loading new video
 	doc.addEventListener("DOMContentLoaded", onMediaLoad);

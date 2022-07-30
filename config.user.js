@@ -12,8 +12,10 @@
 // ==/UserScript==
 
 //global definitions
-if (!window.doc) window.doc = document;
-window.site_dict = {
+if (!window.win) window.win = window;
+if (!win.doc) win.doc = document;
+if (!win.bod) win.bod = doc.body;
+win.site_dict = {
 	A: "apple.stackexchange.com",
 	R: "reddit.com",
 	Q: "quora.com",

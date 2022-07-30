@@ -9,10 +9,6 @@
 // @match        https://www.tiktok.com/*
 // ==/UserScript==
 
-const doc = document,
-	win = window,
-	bod = doc.body;
-
 //helper fns
 function addStyleSheet() {
 	const css = `

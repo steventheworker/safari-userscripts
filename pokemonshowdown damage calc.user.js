@@ -12,9 +12,6 @@
 //redefine some globals
 const $ = window.jQuery;
 
-//more globals
-const bod = $("body");
-
 //config
 const W = 1285;
 
