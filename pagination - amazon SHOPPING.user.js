@@ -23,7 +23,7 @@ function EventListeners() {
 		const isInput = nn === "INPUT" || nn === "TEXTAREA";
 		if (isInput) return;
 		//^^^ (above) prevent's shortcut's within Text Input's
-		const query = $(".a-pagination a");
+		const query = $(".s-pagination-strip a");
 		if (e.key === "ArrowLeft" && !e.metaKey) query[0].click(); //previous episode
 		if (e.key === "ArrowRight" && !e.metaKey)
 			query[query.length - 1].click(); //next episode

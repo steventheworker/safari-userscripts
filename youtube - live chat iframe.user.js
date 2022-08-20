@@ -60,8 +60,17 @@ function initPage() {
 }
 function addListeners(btn) {
 	//keyboard events
-	win.addEventListener("keypress", function (e) {
-		if (e.key === "k" && e.metaKey) markAsRead();
+	win.addEventListener("keyup", (e) => {
+		if (e.key === "Escape" && doc.activeElement.id !== "input") {
+			if (win.top.document.activeElement.nodeName === "IFRAME")
+				win.top.document.activeElement.blur();
+		}
+	});
+	win.addEventListener("keydown", function (e) {
+		if (e.key === "k" && e.metaKey) {
+			e.preventDefault(); //prev firefox shortcut (cmd+k: focus search/location bar)
+			markAsRead();
+		}
 	});
 	//mouse events
 	win.addEventListener("click", function (e) {
@@ -104,7 +113,10 @@ function addListeners(btn) {
 
 	//parent events
 	if (win.top === window) return;
-	win.top.addEventListener("keypress", function (e) {
-		if (e.key === "k" && e.metaKey) markAsRead();
+	win.top.addEventListener("keydown", (e) => {
+		if (e.key === "k" && e.metaKey) {
+			e.preventDefault(); //prev firefox shortcut (cmd+k: focus search/location bar)
+			markAsRead();
+		}
 	});
 }

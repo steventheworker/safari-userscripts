@@ -51,9 +51,15 @@
 			let links = document.getElementsByClassName(
 				"ListingLayout-outerContainer"
 			)[0].children[1];
-			links =
-				links.children[links.children.length - 1].children[0]
-					.children[1].children[1];
+			links = links.children[links.children.length - 1].children[0];
+
+			if (
+				links.children[0].children.length &&
+				!win.location.pathname.startsWith("/r/news")
+			)
+				links = links.children[0].children[1];
+			else links = links.children[1].children[1];
+
 			const linkLabel = sortRedditdMap[e.key];
 			const selectIndex = linkLabel
 				? (function getSelectIndex() {

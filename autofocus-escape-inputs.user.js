@@ -61,7 +61,7 @@
 				"www.walmart.com": 1,
 			};
 			if (loc === "www.netflix.com")
-				doc.querySelector(".icon-search").click(); //input is hidden until icon clicked
+				doc.getElementsByClassName("search-icon")[0].parentNode.click(); //input is hidden until icon clicked
 			const lastIndex = ray.length - 1;
 			let i = inputIndexDict[loc];
 			if ((isNaN(i) && !i) || i > lastIndex) i = lastIndex; //default = last input element in ray
