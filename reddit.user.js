@@ -12,7 +12,7 @@
 function openThread(el, newTab) {
 	if (!el) return;
 	if (el.nodeName !== "A")
-		return openUrl(
+		return openThread(
 			Array.from(el.querySelectorAll("a")).filter(
 				(el, i) => el.children[0]?.children[0]?.nodeName === "H3"
 			)[0],
