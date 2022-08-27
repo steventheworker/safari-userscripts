@@ -218,6 +218,15 @@ function main() {
 				}
 			}
 		}
+		//open query on YouTube
+		if (e.key === "y" && e.shiftKey && e.metaKey)
+			window.open(
+				"https://www.youtube.com/results?search_query=" +
+					encodeURIComponent(
+						doc.querySelector("input").value
+					).replace(/%20/g, "+"),
+				"_blank"
+			);
 	});
 	bod.style.transition = "opacity 333ms ease-in-out";
 	win.addEventListener("keyup", function (e) {

@@ -1,4 +1,16 @@
-steven's userscripts
+steven's userscripts &nbsp; &nbsp; &nbsp; &nbsp; -- targeting macOS Firefox and Safari on iOS as well, but should work on all platforms
+
+### <u>Setup</u>
+
+[<u>**Userscripts extension**</u>](https://itunes.apple.com/us/app/userscripts/id1463298887) (recommended): &nbsp; no setup required & works on iOS!
+
+<u>**Tampermonkey**</u>: &nbsp; step 1, open config.user.js in the built-in editor and open the settings tab. Set the position to 1, and "run at" to document-start.
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; step 2 (<u>**OPTIONAL) + (Firefox ONLY**</u>): &nbsp; host this folder as http://localhost/userscripts (port 80) with any web server and import tampermonkey-export.zip (allows you to edit these userscripts from your filesystem / favorite editor; use "git pull" to live patch updates from this GitHub)
+
+&nbsp;
+
+## <u>Global / Mobile / Other Features</u>
 
 safari specific
 
@@ -15,6 +27,8 @@ other features:
 -   autofocus text inputs (with / ) and blur with escape key
 -   scrolling with keys: wsik (aka the home rows: wasd, ijkl) (ad jl usually do something too)
 -   social media (instagram, reddit, tiktok, youtube, yelp)
+
+&nbsp;
 
 # (Domain Specific) Userscripts features:
 

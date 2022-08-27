@@ -9,6 +9,19 @@
 // @match        https://www.reddit.com/*
 // ==/UserScript==
 
+function openThread(el, newTab) {
+	if (!el) return;
+	if (el.nodeName !== "A")
+		return openUrl(
+			Array.from(el.querySelectorAll("a")).filter(
+				(el, i) => el.children[0]?.children[0]?.nodeName === "H3"
+			)[0],
+			newTab
+		);
+	// window.open(el.href, newTab ? "_blank" : undefined);
+	el.focus();
+}
+
 //init
 (function () {
 	//reddit thread shortcut.user.js
@@ -41,6 +54,11 @@
 			}
 		} else {
 			//subreddit mode
+			if (e.shiftKey) {
+				if (e.key === "Enter") openThread(doc.activeElement);
+			} else if (e.metaKey) {
+				if (e.key === "Enter") openThread(doc.activeElement, true);
+			}
 			const sortRedditdMap = {
 				B: "Best" /* sometimes DNE */,
 				H: "Hot",
@@ -54,8 +72,9 @@
 			links = links.children[links.children.length - 1].children[0];
 
 			if (
-				links.children[0].children.length &&
-				!win.location.pathname.startsWith("/r/news")
+				links.children[0].children.length
+				// &&
+				// !win.location.pathname.startsWith("/r/news")
 			)
 				links = links.children[0].children[1];
 			else links = links.children[1].children[1];
