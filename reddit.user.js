@@ -72,7 +72,10 @@ function openThread(el, newTab) {
 			links = links.children[links.children.length - 1].children[0];
 
 			if (
-				links.children[0].children.length
+				links.children[0].children.length > 3 &&
+				!links.children[0].children[0]
+					.getAttribute("href")
+					?.startsWith("/user/")
 				// &&
 				// !win.location.pathname.startsWith("/r/news")
 			)

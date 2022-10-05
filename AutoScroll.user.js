@@ -2,7 +2,7 @@
 // @name         AutoScroll
 // @namespace    github.com/steventheworker
 // @version      0.2
-// @description  Empower yourself with a feature that is solely built into Firefox (within the Apple ecosystem). Use autoscrolling on chrome/Safari with this userscript.
+// @description  a feature that is solely built into Firefox (within the Apple ecosystem). Use autoscrolling on chrome/Safari with this userscript. (ie: hold middle mouse button to AutoScroll)
 // @author       Steven G.
 // @match        *://*/*
 // @grant        none

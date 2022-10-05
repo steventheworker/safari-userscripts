@@ -47,9 +47,13 @@ function getVidID() {
 	return win.location.search.replace("?v=", "");
 }
 function numComments() {
-	return parseFloat(
-		(doc.querySelector("ytd-comments-header-renderer #count span") || {})
-			.textContent
+	return (
+		parseFloat(
+			(
+				doc.querySelector("ytd-comments-header-renderer #count span") ||
+				{}
+			).textContent
+		) | 0
 	);
 }
 function videoFixed(sticky = true) {
@@ -255,7 +259,7 @@ function ListenEvents() {
 			if (e.key === "w" || e.key === "i") {
 				win.scroll({
 					left: 0,
-					top: window.scrollY - 300,
+					top: win.scrollY - 300,
 					behavior: "smooth",
 				}); //pgup
 				if (e.key === "i") e.stopImmediatePropagation();
@@ -369,19 +373,25 @@ function addStyleSheet() {
 
     ytd-compact-video-renderer:not([watch-feed-big-thumbs]) ytd-thumbnail.ytd-compact-video-renderer {width: 146.1px;}
 
-    /* comment body font-size */
+    /* comment body - increase font-size */
     #content-text.ytd-comment-renderer {font-size: 1.61rem;line-height:2.3rem;}
-    /* comment replies (nested) */
+		/* comment replies (nested) */
     ytd-comment-replies-renderer #content-text.ytd-comment-renderer {
          font-size: 1.5rem;line-height: 2.14rem;
     }
     ytd-comment-replies-renderer #main {margin-top: -15px;margin-left: -15px;}
     ytd-comment-replies-renderer ytd-comment-renderer {margin-top: 10px;}
+	 		/* increase profile photo size */
+	yt-img-shadow.ytd-comment-renderer {
+		width: 75px !important;height: 75px !important;
+		margin-top: -10px;margin-left: -10px;
+	}
+	 		/* increase (nested) profile photo size */
     ytd-comment-renderer:not([comment-style=backstage-comment])[is-reply] #author-thumbnail.ytd-comment-renderer yt-img-shadow.ytd-comment-renderer {
-         width: 50px;height: 50px;
+			width: 50px !important;height: 50px !important;
          margin-top: -10px;margin-left: -10px;
     }
-
+	 		/* make comments show leftmost (undo margin-left/padding-left) */
     #author-thumbnail.ytd-comment-renderer yt-img-shadow.ytd-comment-renderer {width: 69px; height: 69px;margin-left: -14.5px;margin-top: -14.5px;}
     tp-yt-paper-button.ytd-button-renderer {font-size: 1.6rem;}
 
@@ -434,6 +444,9 @@ function addStyleSheet() {
 	 ytd-watch-flexy[theater-requested_]:not([fullscreen]) #player-theater-container {
 		 height:calc(100vh - 56px) !important; max-height:calc(100vh - 56px) !important;min-height:calc(100vh - 56px) !important;
 	 }
+
+	 /* outline focused thumbnail (search results) */
+	 .ytd-search a:focus {text-decoration: underline;}
 `,
 		head = doc.head || doc.getElementsByTagName("head")[0],
 		style = doc.createElement("style");

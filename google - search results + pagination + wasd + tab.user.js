@@ -165,20 +165,20 @@ function main() {
 				behavior: "smooth",
 			}); //pgdn
 		if (e.key === "s") nextResult();
-		if (e.key === "j")
+		if (e.key === "h")
 			win.scroll({
 				left: 0,
 				top: win.scrollY - 300,
 				behavior: "smooth",
 			}); //pgup
-		if (e.key === "i") prevResult();
+		if (e.key === "k") prevResult();
 		if (e.key === "l")
 			win.scroll({
 				left: 0,
 				top: win.scrollY + 300,
 				behavior: "smooth",
 			}); //pgdn
-		if (e.key === "k") nextResult();
+		if (e.key === "j") nextResult();
 		if (e.key === "ArrowUp") prevResult(e);
 		if (e.key === "ArrowDown") nextResult(e);
 		if (e.key === "Tab") {
