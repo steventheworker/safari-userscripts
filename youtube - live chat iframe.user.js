@@ -6,7 +6,7 @@
 // @author       steventheworker
 // @grant        none
 // @icon         https://www.youtube.com/s/desktop/f73a46b5/img/favicon.ico
-// @match        https://www.youtube.com/*
+// @match        https://www.youtube.com/live_chat*
 // ==/UserScript==
 
 const globalCSS = `
