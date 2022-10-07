@@ -16,9 +16,7 @@ const $ = (window.$ = (sel) => {
 });
 function EventListeners() {
 	$(window).addEventListener("keydown", function (e) {
-		const nn = document.activeElement.nodeName;
-		const isInput = nn === "INPUT" || nn === "TEXTAREA";
-		if (isInput) return;
+		if (isInput(doc.activeElement)) return;
 		//^^^ (above) prevent's shortcut's within Text Input's
 		const query = $(".prev-link, .next-link");
 		if (e.key === "ArrowLeft" && !e.metaKey) query[0].click(); //previous page

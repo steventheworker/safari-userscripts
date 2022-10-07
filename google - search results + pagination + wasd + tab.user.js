@@ -144,9 +144,9 @@ function main() {
 	focusedElRef.focus(); //reset focus on input, if it was there before
 	//listen dom events
 	win.addEventListener("keydown", function (e) {
-		const nn = doc.activeElement.nodeName;
-		if (nn === "INPUT" || nn === "TEXTAREA") return;
-		if (e.key === "Enter" && nn !== "A") ray[i].querySelector("a").click(); //only virtually "click" link if not already focused on link
+		if (isInput(doc.activeElement)) return;
+		if (e.key === "Enter" && doc.activeElement.nodeName !== "A")
+			ray[i].querySelector("a").click(); //only virtually "click" link if not already focused on link
 		//prev & next arrow keys
 		if (e.key === "ArrowRight" && !e.metaKey) win.location = $next().href;
 		if (e.key === "ArrowLeft" && !e.metaKey) win.location = $prev().href;
@@ -230,16 +230,14 @@ function main() {
 	});
 	bod.style.transition = "opacity 333ms ease-in-out";
 	win.addEventListener("keyup", function (e) {
-		const nn = doc.activeElement.nodeName;
-		if (nn === "INPUT" || nn === "TEXTAREA") return;
+		if (isInput(doc.activeElement)) return;
 		if (e.key === "Escape") {
 			bod.style.opacity = 0.5;
 			setTimeout(() => (bod.style.opacity = 1), 333);
 		}
 	});
 	win.addEventListener("click", function (e) {
-		const nn = doc.activeElement.nodeName;
-		if (nn === "INPUT" || nn === "TEXTAREA") return;
+		if (isInput(doc.activeElement)) return;
 		let tarRes = findParentResult(e.target);
 		if (tarRes && tarRes.classList.length > 1) tarRes = null; //todo: filter search results //everything with more than 1 class is not a regular search result, so filter them out
 		if (tarRes && tarRes.classList.contains("g")) {

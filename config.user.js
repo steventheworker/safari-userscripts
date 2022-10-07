@@ -13,6 +13,8 @@
 
 function defineGlobals() {
 	if (!window.win) window.win = window;
+	else if (win.document !== window.document)
+		alert("houston, we have an issue: @steventheworker/safari-userscripts");
 	//search a site with shift + Letter (eg: append site:website.com to search query on search engines)
 	win.site_dict = {
 		A: "apple.stackexchange.com",
@@ -26,11 +28,15 @@ function defineGlobals() {
 	//set bod (after doc ready (body isn't defined until DOMContentLoaded))
 	if (doc.readyState !== "loading") win.bod = doc.body;
 	else doc.addEventListener("DOMContentLoaded", () => (win.bod = doc.body));
+
+	//helper fn's
+	win.isInput = isInput;
 }
 
 let settingsDrawn = false;
 function settingsContents() {
 	const container = doc.createElement("div");
+	//todo: container.append setting 1.. setting 2.. etc...
 	return container;
 }
 function settingsCloseBtn() {
@@ -76,3 +82,15 @@ function listenKeys() {
 	defineGlobals();
 	listenKeys();
 })();
+
+//helper fn's
+function isInput(el) {
+	const nn = el.nodeName;
+	if (
+		nn === "INPUT" ||
+		nn === "TEXTAREA" ||
+		(nn === "DIV" && el.contentEditable)
+	)
+		return true;
+	return false;
+}

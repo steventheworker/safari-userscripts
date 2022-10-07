@@ -30,13 +30,7 @@ function openThread(el, newTab) {
 		"div { max-width: none !important; }
 	`);
 	window.addEventListener("keydown", function (e) {
-		const nn = document.activeElement.nodeName;
-		if (
-			nn === "INPUT" ||
-			nn === "TEXTAREA" ||
-			(nn == "DIV" && document.activeElement.contentEditable === "true")
-		)
-			return;
+		if (isInput(doc.activeElement)) return;
 		//sort
 		const threadSortPicker = document.querySelector(
 			"button#CommentSort--SortPicker"

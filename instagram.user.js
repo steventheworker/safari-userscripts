@@ -9,19 +9,6 @@
 // @match        https://www.instagram.com/*
 
 // ==/UserScript==
-
-//helpers
-function isTextBox(tar) {
-	const nn = tar.nodeName;
-	if (
-		nn === "INPUT" ||
-		nn === "TEXTAREA" ||
-		(nn === "DIV" && tar.contentEditable)
-	)
-		return true;
-	return false;
-}
-
 //- Wasd dashScrollUp dashScrollDown leftPhoto rightPhoto (if multi-photo pic)
 //&&&&&&& - Never show me the same pictures again (only remove the one’s you’ve scrolled past / visibly scrolled past)
 
@@ -88,7 +75,7 @@ function dbl_esc_key(e) {
 	"use strict";
 	window.addEventListener("keydown", function (e) {
 		if (e.key === "Escape") return dbl_esc_key(e);
-		if (isTextBox(document.activeElement)) return;
+		if (isInput(document.activeElement)) return;
 		keysdown[e.key] = 1;
 		if (runningPg) return;
 		startRunningPg();
@@ -98,7 +85,7 @@ function dbl_esc_key(e) {
 		"keyup",
 		function (e) {
 			if (e.key === "Escape") return dbl_esc_key(e);
-			if (isTextBox(document.activeElement)) return;
+			if (isInput(document.activeElement)) return;
 			delete keysdown[e.key];
 			if (!Object.keys(keysdown).length)
 				runningPg = clearInterval(runningPg);

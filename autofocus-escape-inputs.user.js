@@ -16,11 +16,7 @@
 	};
 	window.addEventListener("keyup", function (e) {
 		const loc = window.location.host;
-		const nn = doc.activeElement.nodeName;
-		const isInput =
-			nn === "INPUT" ||
-			nn === "TEXTAREA" ||
-			(nn === "DIV" && doc.activeElement.contentEditable === "true");
+		const isInput = isInput(doc.activeElement);
 		if (e.key === "Escape" && isInput && !escBlacklist[loc])
 			doc.activeElement.blur();
 		if (e.key === "/" && !isInput) {
