@@ -29,18 +29,38 @@ function defineGlobals() {
 }
 
 let settingsDrawn = false;
+function settingsContents() {
+	const container = doc.createElement("div");
+	return container;
+}
+function settingsCloseBtn() {
+	const container = doc.createElement("span");
+	container.appendChild(doc.createTextNode("x"));
+	container.style =
+		"color: red; font-weight: bold; cursor: pointer; position: absolute; margin-top: -0.5em; margin-left: -0.25em; font-size: 1.5em; text-shadow: 0 0 2px black";
+	container.addEventListener("click", toggleSettings);
+	return container;
+}
 function drawSettings() {
 	settingsDrawn = true;
 	const settingsContainer = doc.createElement("div");
 	settingsContainer.style =
-		"position: absolute; top: 50%; left: 50%; margin-left: -175px; margin-top: -175px; width: 350px; height: 350px; outline: 1px solid red; background: rgba(0, 255, 255, 0.5);";
+		"display: block; position: fixed; top: 50%; left: 50%; margin-left: -175px; margin-top: -175px; width: 350px; height: 350px; outline: 1px solid red; background: rgba(0, 255, 255, 0.5); z-index: 2147483645;";
 	settingsContainer.id = "dotUserSettingsContainer";
+	const relativeContainer = doc.createElement("div");
+	relativeContainer.style = "position: relative; width: 100%; height: 100%;";
+	relativeContainer.appendChild(settingsCloseBtn());
+	relativeContainer.appendChild(settingsContents());
+	settingsContainer.appendChild(relativeContainer);
 	bod.appendChild(settingsContainer);
 }
-const showSettings = () =>
-	(doc.getElementById("createElement").style.display = "block");
+const toggleSettings = () =>
+	(doc.getElementById("dotUserSettingsContainer").style.display =
+		doc.getElementById("dotUserSettingsContainer").style.display === "block"
+			? "none"
+			: "block");
 function openSettings() {
-	if (settingsDrawn) return showSettings();
+	if (settingsDrawn) return toggleSettings();
 	drawSettings();
 }
 
