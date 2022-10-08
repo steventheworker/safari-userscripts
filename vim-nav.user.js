@@ -41,7 +41,7 @@ function checkBlacklisted(e) {
 (function () {
 	"use strict";
 	window.addEventListener("keydown", (e) => {
-		if (checkBlacklisted(e)) return;
+		if ($isInput(doc.activeElement) || checkBlacklisted(e)) return;
 		const siteSettings = blacklistJSON[win.location.hostname];
 		if (e.key === "j" || e.key === "k" || e.key === "F" || e.key === "f") {
 			win.scroll({
