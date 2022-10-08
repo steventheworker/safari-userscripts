@@ -9,8 +9,6 @@
 // @icon         https://upload.wikimedia.org/wikipedia/en/7/71/Safari_14_icon.png
 // ==/UserScript==
 
-//helpers / boilerplate
-const bod = doc.body;
 function addStyleSheet() {
 	const css = `
 		 /* desktop virtual status bar */

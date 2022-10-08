@@ -8,10 +8,7 @@
 // @grant        none
 // ==/UserScript==
 
-//helpers / boilerplate
-const /* doc = document,
-	win = window, */
-	bod = doc.body;
+const modifierBtns = { "^": "ctrl", "⌥": "opt", "⌘": "cmd" };
 function addStyleSheet() {
 	const css = `
 		 /* mobile keyboard */
@@ -23,6 +20,11 @@ function addStyleSheet() {
 			 height: 100%;
 			 z-index: 2147483647;
 		 }
+		 .mkb-overlay {
+			 width: 100%;
+			 height: 100%;
+			 background: rgba(255, 0, 0, 0.0333);
+		 }
 		 .mkb-input {
 			font-size: 1.9rem;
 			width: 50%;
@@ -31,11 +33,25 @@ function addStyleSheet() {
 			bottom: 0;
 			box-sizing: border-box;
 			padding: 0.5rem;
+			background: black;
 		 }
-		 .mkb-overlay {
-			 width: 100%;
-			 height: 100%;
-			 background: rgba(255, 0, 0, 0.0333);
+		 .mkb-modifiers {
+			position: absolute;
+			bottom: 0;
+			margin: 0.5rem;
+			margin-left: 50%;
+			width: 25%;
+			height: 1.9rem;
+		 }
+		 .mkb-modifiers button {
+			float: right;
+			width: 33%;
+			height: 100%;
+			background: black;
+			color: white;
+		 }
+		 ._modSelected {
+			background: darkgreen !important;
 		 }
    `,
 		head = doc.head || doc.getElementsByTagName("head")[0],
@@ -63,6 +79,15 @@ function listenGlobalEvents() {
 		}
 	});
 }
+function getModifierObj() {
+	const modObj = {};
+	const btnsSelected = Array.from(doc.getElementsByClassName("_modSelected"));
+	btnsSelected.forEach((el, i) => {
+		modObj[modifierBtns[el.innerHTML]] = true;
+		el.classList.remove("_modSelected");
+	});
+	return modObj;
+}
 function $input() {
 	const el = doc.createElement("input");
 	el.classList.add("mkb-input");
@@ -71,10 +96,25 @@ function $input() {
 	el.setAttribute("autocomplete", "off");
 	el.onkeyup = function (e) {
 		el.blur();
-		triggerKeyDown(e.key);
+		triggerKeyDown(e.key, getModifierObj());
 		if (e.key !== "/") toggleMKB(); // don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
 		setTimeout(() => (this.value = ""), 167);
 	};
+	return el;
+}
+function $modifierBtns() {
+	const el = doc.createElement("div");
+	el.classList.add("mkb-modifiers");
+	for (const label in modifierBtns) {
+		const btn = doc.createElement("button");
+		btn.innerHTML = label;
+		btn.addEventListener("click", (e) => {
+			if (!btn.classList.contains("_modSelected"))
+				btn.classList.add("_modSelected");
+			else btn.classList.remove("_modSelected");
+		});
+		el.appendChild(btn);
+	}
 	return el;
 }
 function $overlay() {
@@ -88,6 +128,7 @@ function $container() {
 	_input = $input();
 	el.appendChild($overlay());
 	el.appendChild(_input);
+	el.appendChild($modifierBtns());
 	return el;
 }
 
@@ -99,6 +140,7 @@ function $container() {
 	_container = $container();
 	_container.style.display = "none";
 	bod.appendChild(_container);
+	// _container.style.display = "block"; // # force show on page load
 	listenGlobalEvents();
 })();
 
@@ -109,8 +151,8 @@ function triggerKeyDown(key, modifiers = {}) {
 		altKey: modifiers.alt || modifiers.opt ? true : false,
 		bubbles: true,
 		cancelBubble: false,
-		cancelable: true,
-		charCode: 0,
+		cancelable: false,
+		charCode: keyCode,
 		code: key,
 		composed: true,
 		ctrlKey: modifiers.ctrl ? true : false,
@@ -126,7 +168,7 @@ function triggerKeyDown(key, modifiers = {}) {
 		metaKey: modifiers.meta || modifiers.cmd ? true : false,
 		repeat: false,
 		returnValue: false,
-		shiftKey: modifiers.shift ? true : false,
+		shiftKey: key === key.toUpperCase() ? true : false,
 		type: "keydown",
 		which: keyCode,
 	});
