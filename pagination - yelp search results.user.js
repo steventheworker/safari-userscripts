@@ -25,7 +25,7 @@ function init() {
 	console.log(666, "steventheworker", 666);
 	//prev & next arrow keys
 	window.addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		if (e.key === "ArrowRight" && !e.metaKey)
 			window.location = $next().href;
 		if (e.key === "ArrowLeft" && !e.metaKey) window.location = $prev().href;

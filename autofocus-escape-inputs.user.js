@@ -16,7 +16,7 @@
 	};
 	window.addEventListener("keyup", function (e) {
 		const loc = window.location.host;
-		const isInput = isInput(doc.activeElement);
+		const isInput = $isInput(doc.activeElement);
 		if (e.key === "Escape" && isInput && !escBlacklist[loc])
 			doc.activeElement.blur();
 		if (e.key === "/" && !isInput) {

@@ -75,7 +75,7 @@ function dbl_esc_key(e) {
 	"use strict";
 	window.addEventListener("keydown", function (e) {
 		if (e.key === "Escape") return dbl_esc_key(e);
-		if (isInput(document.activeElement)) return;
+		if ($isInput(document.activeElement)) return;
 		keysdown[e.key] = 1;
 		if (runningPg) return;
 		startRunningPg();
@@ -85,7 +85,7 @@ function dbl_esc_key(e) {
 		"keyup",
 		function (e) {
 			if (e.key === "Escape") return dbl_esc_key(e);
-			if (isInput(document.activeElement)) return;
+			if ($isInput(document.activeElement)) return;
 			delete keysdown[e.key];
 			if (!Object.keys(keysdown).length)
 				runningPg = clearInterval(runningPg);

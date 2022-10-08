@@ -11,7 +11,7 @@
 
 function listenEvents() {
 	window.addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		//Arrow Left+Right
 		if (e.key === "ArrowLeft")
 			doc.querySelector(`.b_pag a[title="Previous page"]`).click();

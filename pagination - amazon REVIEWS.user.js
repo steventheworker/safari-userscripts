@@ -16,7 +16,7 @@ const $ = (window.$ = (sel) => {
 });
 function EventListeners() {
 	$(window).addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		//^^^ (above) prevent's shortcut's within Text Input's
 		const query = $(".a-pagination li");
 		if (e.key === "ArrowLeft" && !e.metaKey) query[0].children[0].click(); //previous episode

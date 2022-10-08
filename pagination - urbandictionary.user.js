@@ -20,7 +20,7 @@ function remove_cookie_popup() {
 //events
 function addListeners() {
 	window.addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		if (e.key === "ArrowRight" && !e.metaKey)
 			document.querySelector("a[rel='next']").click();
 		if (e.key === "ArrowLeft" && !e.metaKey)

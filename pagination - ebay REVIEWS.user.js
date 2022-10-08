@@ -16,7 +16,7 @@ const $ = (window.$ = (sel) => {
 });
 function EventListeners() {
 	$(window).addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($wwwwwisInput(doc.activeElement)) return;
 		//^^^ (above) prevent's shortcut's within Text Input's
 		const query = $('button[type="previous"], button[type="next"]');
 		if (e.key === "ArrowLeft" && !e.metaKey) query[0].click(); //previous episode

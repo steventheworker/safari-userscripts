@@ -247,7 +247,7 @@ function ListenEvents() {
 	win.addEventListener(
 		"keydown",
 		function (e) {
-			if (isInput(doc.activeElement)) return;
+			if ($isInput(doc.activeElement)) return;
 
 			//remap keys WASD IJKL
 			if (e.key === "w" || e.key === "i") {
@@ -313,7 +313,7 @@ function ListenEvents() {
 				[menuIndex].querySelectorAll("a")
 				[itemIndex].click();
 		}
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		//shortcuts
 		if (e.key === "H") clickItem(0, 0);
 		if (e.key === "D") clickItem(0, 1); //Today = "Day" (D)

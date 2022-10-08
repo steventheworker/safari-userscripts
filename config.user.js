@@ -30,7 +30,7 @@ function defineGlobals() {
 	else doc.addEventListener("DOMContentLoaded", () => (win.bod = doc.body));
 
 	//helper fn's
-	win.isInput = isInput;
+	win.$isInput = $isInput;
 }
 
 let settingsDrawn = false;
@@ -84,7 +84,7 @@ function listenKeys() {
 })();
 
 //helper fn's
-function isInput(el) {
+function $isInput(el) {
 	const nn = el.nodeName;
 	if (
 		nn === "INPUT" ||
