@@ -89,7 +89,7 @@ function $isInput(el) {
 	if (
 		nn === "INPUT" ||
 		nn === "TEXTAREA" ||
-		(nn === "DIV" && el.contentEditable)
+		(nn === "DIV" && el.contentEditable === "true")
 	)
 		return true;
 	return false;
