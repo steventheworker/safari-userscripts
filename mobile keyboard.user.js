@@ -8,7 +8,10 @@
 // @grant        none
 // ==/UserScript==
 
-const modifierBtns = { "^": "ctrl", "⌥": "opt", "⌘": "cmd" };
+const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" };
+const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
+// const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
+
 function addStyleSheet() {
 	const css = `
 		 /* mobile keyboard */
@@ -45,10 +48,20 @@ function addStyleSheet() {
 		 }
 		 .mkb-modifiers button {
 			float: right;
-			width: 33%;
+			width: 24%;
+			margin: 0;
+			margin-right: 0.5%;
 			height: 100%;
 			background: black;
 			color: white;
+			text-align: right;
+			box-sizing: border-box;
+			border: none;
+			outline: 1px solid grey !important;
+		 }
+		 .mkb-modifiers button:last-child { /* shift key btn */
+			padding-left: 0.75em;
+			text-align: left;
 		 }
 		 ._modSelected {
 			background: darkgreen !important;
@@ -79,8 +92,17 @@ function listenGlobalEvents() {
 		}
 	});
 }
-function getModifierObj() {
+function getModifierObj(e) {
 	const modObj = {};
+	//determine if shifted char
+	if (e.code.startsWith("Digit"))
+		modObj.shift = e.code.slice(-1) === e.key ? false : true;
+	else if (e.code.startsWith("Key"))
+		modObj.shift = e.key.toUpperCase() === e.key ? true : false;
+	else modObj.shift = lowerCaseDict.indexOf(e.key) === -1 ? true : false;
+	if (e.shiftKey) modObj.shift = true;
+
+	//other modifiers
 	const btnsSelected = Array.from(doc.getElementsByClassName("_modSelected"));
 	btnsSelected.forEach((el, i) => {
 		modObj[modifierBtns[el.innerHTML]] = true;
@@ -95,8 +117,13 @@ function $input() {
 	el.onblur = toggleMKB;
 	el.setAttribute("autocomplete", "off");
 	el.onkeyup = function (e) {
+		if (e.key === "Shift") return;
 		el.blur();
-		triggerKeyDown(e.key, getModifierObj());
+		const mods = getModifierObj(e);
+		triggerKeyDown(
+			mods.cmd || mods.opt || mods.ctrl ? e.key.toLowerCase() : e.key,
+			mods
+		);
 		if (e.key !== "/") toggleMKB(); // don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
 		setTimeout(() => (this.value = ""), 167);
 	};
@@ -108,11 +135,21 @@ function $modifierBtns() {
 	for (const label in modifierBtns) {
 		const btn = doc.createElement("button");
 		btn.innerHTML = label;
-		btn.addEventListener("click", (e) => {
+		const btnDown = (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+		};
+		const btnUp = (e) => {
+			e.preventDefault();
+			e.stopPropagation();
 			if (!btn.classList.contains("_modSelected"))
 				btn.classList.add("_modSelected");
 			else btn.classList.remove("_modSelected");
-		});
+		};
+		btn.addEventListener("touchstart", btnDown);
+		btn.addEventListener("touchend", btnUp);
+		btn.addEventListener("mousedown", btnDown);
+		btn.addEventListener("mouseup", btnUp);
 		el.appendChild(btn);
 	}
 	return el;
@@ -140,8 +177,8 @@ function $container() {
 	_container = $container();
 	_container.style.display = "none";
 	bod.appendChild(_container);
-	// _container.style.display = "block"; // # force show on page load
 	listenGlobalEvents();
+	// _container.style.display = "block"; // # force show on page load
 })();
 
 /* triggering keys */
@@ -151,16 +188,16 @@ function triggerKeyDown(key, modifiers = {}) {
 		altKey: modifiers.alt || modifiers.opt ? true : false,
 		bubbles: true,
 		cancelBubble: false,
-		cancelable: false,
+		cancelable: true,
 		charCode: keyCode,
-		code: key,
+		code: isNaN(key) ? "Key" + key.toUpperCase() : "Digit" + key,
 		composed: true,
 		ctrlKey: modifiers.ctrl ? true : false,
 		currentTarget: null,
 		defaultPrevented: true,
 		detail: 0,
 		eventPhase: 0,
-		isComposing: false,
+		isComposing: true,
 		isTrusted: true,
 		key,
 		keyCode,
@@ -168,7 +205,7 @@ function triggerKeyDown(key, modifiers = {}) {
 		metaKey: modifiers.meta || modifiers.cmd ? true : false,
 		repeat: false,
 		returnValue: false,
-		shiftKey: key === key.toUpperCase() ? true : false,
+		shiftKey: modifiers.shift ? true : false,
 		type: "keydown",
 		which: keyCode,
 	});
