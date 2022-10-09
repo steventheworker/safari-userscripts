@@ -8,6 +8,7 @@
 // @grant        none
 // ==/UserScript==
 
+const namedKeys = ["Enter", "Tab", "Delete", "Backspace"];
 const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" };
 const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
 // const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
@@ -33,14 +34,15 @@ function addStyleSheet() {
 			width: 50%;
 			margin-left: 25%;
 			position: absolute;
-			bottom: 0;
+			bottom: 25%;
 			box-sizing: border-box;
 			padding: 0.5rem;
 			background: black;
+			color: white;
 		 }
 		 .mkb-modifiers {
 			position: absolute;
-			bottom: 0;
+			bottom: 25%;
 			margin: 0.5rem;
 			margin-left: 50%;
 			width: 25%;
@@ -77,10 +79,14 @@ function addStyleSheet() {
 /*
 	mkb (mobile keyboard)
 */
-let _input, _container; //dom references
+let _input, _container, lastActiveEl; //dom references
 const isShowing = () => _container.style.display !== "none";
 function toggleMKB() {
 	const willShow = !isShowing();
+	if (willShow) {
+		// if (doc.activeElement !== _input)
+		lastActiveEl = doc.activeElement;
+	}
 	_container.style.display = willShow ? "block" : "none";
 	_input[willShow ? "focus" : "blur"]();
 }
@@ -114,19 +120,25 @@ function $input() {
 	const el = doc.createElement("input");
 	el.classList.add("mkb-input");
 	el.placeholder = "Enter a shortcut...";
-	el.onblur = toggleMKB;
-	el.setAttribute("autocomplete", "off");
-	el.onkeyup = function (e) {
+	el.addEventListener("blur", toggleMKB);
+	el.addEventListener("keyup", (e) => {
 		if (e.key === "Shift") return;
 		el.blur();
+		if (lastActiveEl && lastActiveEl.nodeName === "INPUT")
+			lastActiveEl.focus();
+		console.log(doc.activeElement);
 		const mods = getModifierObj(e);
+		//key casing:  key combo's w/ modifiers don't trigger unless lowercase...
 		triggerKeyDown(
-			mods.cmd || mods.opt || mods.ctrl ? e.key.toLowerCase() : e.key,
+			(mods.cmd || mods.opt || mods.ctrl) &&
+				namedKeys.indexOf(e.key) === -1
+				? e.key.toLowerCase()
+				: (mods.shift && e.key.toUpperCase()) || e.key,
 			mods
 		);
 		if (e.key !== "/") toggleMKB(); // don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
-		setTimeout(() => (this.value = ""), 167);
-	};
+		setTimeout(() => (el.value = ""), 167);
+	});
 	return el;
 }
 function $modifierBtns() {
@@ -173,12 +185,13 @@ function $container() {
 (function () {
 	("use strict");
 	console.log("⌨️💪📱");
+	win.toggleMKB = toggleMKB;
 	addStyleSheet();
 	_container = $container();
 	_container.style.display = "none";
 	bod.appendChild(_container);
 	listenGlobalEvents();
-	// _container.style.display = "block"; // # force show on page load
+	setTimeout(() => toggleMKB(), 2000); // # force show on page load
 })();
 
 /* triggering keys */
@@ -193,7 +206,7 @@ function triggerKeyDown(key, modifiers = {}) {
 		code: isNaN(key) ? "Key" + key.toUpperCase() : "Digit" + key,
 		composed: true,
 		ctrlKey: modifiers.ctrl ? true : false,
-		currentTarget: null,
+		currentTarget: lastActiveEl || null,
 		defaultPrevented: true,
 		detail: 0,
 		eventPhase: 0,
@@ -209,5 +222,8 @@ function triggerKeyDown(key, modifiers = {}) {
 		type: "keydown",
 		which: keyCode,
 	});
-	document.body.dispatchEvent(ev);
+	(lastActiveEl !== doc.activeElement
+		? lastActiveEl
+		: document.body
+	).dispatchEvent(ev);
 }

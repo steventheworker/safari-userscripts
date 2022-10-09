@@ -276,7 +276,7 @@ function ListenEvents() {
 			//T N O sort
 			if (e.key === "O") sortByNew(true); //sort by old
 			if (e.key === "T") {
-				triggerKeyDown("t"); //since t = toggle theater mode       we undo the toggle
+				e.stopPropagation(); // triggerKeyDown("t"); //since t = toggle theater mode       we undo the toggle
 				if (commentSortType === "top") return;
 				scrollToComments();
 				sortByTop();
