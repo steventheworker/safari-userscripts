@@ -114,49 +114,6 @@ function onVideoChange(params) {
 	autoLoadComments();
 }
 
-//trigger youtube shortcuts by triggering a keyboard event
-const keymappings = {
-	Space: 32,
-	LeftArrow: 37,
-	RightArrow: 39,
-	m: 77,
-	t: 84,
-	i: 73,
-	Period: 190,
-	Comma: 188,
-};
-function triggerKeyDown(key, shift) {
-	const keyCode = keymappings[key];
-	const ev = new KeyboardEvent("keydown", {
-		altKey: false,
-		bubbles: true,
-		cancelBubble: false,
-		cancelable: true,
-		charCode: 0,
-		code: key,
-		composed: true,
-		ctrlKey: false,
-		currentTarget: null,
-		defaultPrevented: true,
-		detail: 0,
-		eventPhase: 0,
-		isComposing: false,
-		isTrusted: true,
-		key,
-		keyCode,
-		location: 0,
-		metaKey: false,
-		repeat: false,
-		returnValue: false,
-		shiftKey: shift ? true : false,
-		type: "keydown",
-		which: keyCode,
-	});
-
-	doc.body.dispatchEvent(ev);
-}
-window.triggerKeyDown = triggerKeyDown; //todo: remove debug expose
-
 //comments
 function sortByNew(sortByOld) {
 	commentSortType = sortByOld ? "old" : "new";
@@ -270,8 +227,8 @@ function ListenEvents() {
 			if (e.key === "d") triggerKeyDown("RightArrow"); //map to forward
 
 			//[ ] playback speed
-			if (e.key === "[") triggerKeyDown("Comma", true);
-			if (e.key === "]") triggerKeyDown("Period", true);
+			if (e.key === "[") triggerKeyDown(",", { shift: true });
+			if (e.key === "]") triggerKeyDown(".", { shift: true });
 
 			//T N O sort
 			if (e.key === "O") sortByNew(true); //sort by old

@@ -8,10 +8,10 @@
 // @grant        none
 // ==/UserScript==
 
-const namedKeys = ["Enter", "Tab", "Delete", "Backspace"];
 const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" };
-const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
-// const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?", " ", "Enter", "Tab", "Delete", "Backspace"]; // prettier-ignore
+// const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/"]; // prettier-ignore
+const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?"]; // prettier-ignore
+const namedKeys = [" ", "Enter", "Tab", "Delete", "Backspace", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Escape"]; // prettier-ignore
 
 function addStyleSheet() {
 	const css = `
@@ -105,7 +105,10 @@ function getModifierObj(e) {
 		modObj.shift = e.code.slice(-1) === e.key ? false : true;
 	else if (e.code.startsWith("Key"))
 		modObj.shift = e.key.toUpperCase() === e.key ? true : false;
-	else modObj.shift = lowerCaseDict.indexOf(e.key) === -1 ? true : false;
+	else
+		modObj.shift =
+			upperCaseDict.indexOf(e.key) !== -1 &&
+			namedKeys.indexOf(e.key) === -1;
 	if (e.shiftKey) modObj.shift = true;
 
 	//other modifiers
@@ -123,20 +126,22 @@ function $input() {
 	el.addEventListener("blur", toggleMKB);
 	el.addEventListener("keyup", (e) => {
 		if (e.key === "Shift") return;
-		el.blur();
+		el.blur(); //triggers toggleMKB (without endless loop)
 		if (lastActiveEl && lastActiveEl.nodeName === "INPUT")
 			lastActiveEl.focus();
-		console.log(doc.activeElement);
+		// console.log(doc.activeElement);
 		const mods = getModifierObj(e);
 		//key casing:  key combo's w/ modifiers don't trigger unless lowercase...
+		const isNamedKey = !(namedKeys.indexOf(e.key) === -1);
+		console.log(e.key, isNamedKey, mods);
 		triggerKeyDown(
-			(mods.cmd || mods.opt || mods.ctrl) &&
-				namedKeys.indexOf(e.key) === -1
+			(mods.cmd || mods.opt || mods.ctrl) && !isNamedKey
 				? e.key.toLowerCase()
-				: (mods.shift && e.key.toUpperCase()) || e.key,
+				: (mods.shift && !isNamedKey && e.key.toUpperCase()) || e.key,
 			mods
 		);
-		if (e.key !== "/") toggleMKB(); // don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
+		//refocus MKB,  but don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
+		if (!(e.key === "/" && !mods.shift && !mods.ctrl && !mods.opt && !mods.cmd)) toggleMKB(); // prettier-ignore
 		setTimeout(() => (el.value = ""), 167);
 	});
 	return el;
@@ -193,37 +198,3 @@ function $container() {
 	listenGlobalEvents();
 	setTimeout(() => toggleMKB(), 2000); // # force show on page load
 })();
-
-/* triggering keys */
-function triggerKeyDown(key, modifiers = {}) {
-	const keyCode = key.charCodeAt(0);
-	const ev = new KeyboardEvent("keydown", {
-		altKey: modifiers.alt || modifiers.opt ? true : false,
-		bubbles: true,
-		cancelBubble: false,
-		cancelable: true,
-		charCode: keyCode,
-		code: isNaN(key) ? "Key" + key.toUpperCase() : "Digit" + key,
-		composed: true,
-		ctrlKey: modifiers.ctrl ? true : false,
-		currentTarget: lastActiveEl || null,
-		defaultPrevented: true,
-		detail: 0,
-		eventPhase: 0,
-		isComposing: true,
-		isTrusted: true,
-		key,
-		keyCode,
-		location: 0,
-		metaKey: modifiers.meta || modifiers.cmd ? true : false,
-		repeat: false,
-		returnValue: false,
-		shiftKey: modifiers.shift ? true : false,
-		type: "keydown",
-		which: keyCode,
-	});
-	(lastActiveEl !== doc.activeElement
-		? lastActiveEl
-		: document.body
-	).dispatchEvent(ev);
-}
