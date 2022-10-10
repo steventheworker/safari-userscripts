@@ -79,7 +79,8 @@ function addStyleSheet() {
 /*
 	mkb (mobile keyboard)
 */
-let _input, _container, lastActiveEl; //dom references
+let _input, _container; //dom references
+window.lastActiveEl = null; //used by triggerKeyDown
 const isShowing = () => _container.style.display !== "none";
 function toggleMKB() {
 	const willShow = !isShowing();
@@ -196,5 +197,5 @@ function $container() {
 	_container.style.display = "none";
 	bod.appendChild(_container);
 	listenGlobalEvents();
-	setTimeout(() => toggleMKB(), 2000); // # force show on page load
+	// setTimeout(() => toggleMKB(), 2000); // # force show on page load
 })();
