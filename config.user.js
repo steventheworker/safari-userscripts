@@ -142,7 +142,7 @@ function triggerKeyDown(key, modifiers = {}) {
 		type: "keydown",
 		which: keyCode,
 	});
-	(lastActiveEl !== doc.activeElement
+	(lastActiveEl && lastActiveEl !== doc.activeElement
 		? lastActiveEl
 		: document.body
 	).dispatchEvent(ev);
