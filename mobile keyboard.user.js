@@ -12,6 +12,8 @@ const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" }
 // const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/"]; // prettier-ignore
 const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?"]; // prettier-ignore
 const namedKeys = [" ", "Enter", "Tab", "Delete", "Backspace", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Escape"]; // prettier-ignore
+let _input, _container; //dom references
+win.lastActiveEl = null; //used by triggerKeyDown (config.user.js)
 
 function addStyleSheet() {
 	const css = `
@@ -77,21 +79,14 @@ function addStyleSheet() {
 }
 
 /*
-	mkb (mobile keyboard)
+	event listeners
 */
-let _input, _container; //dom references
-window.lastActiveEl = null; //used by triggerKeyDown
-const isShowing = () => _container.style.display !== "none";
-function toggleMKB() {
-	const willShow = !isShowing();
-	if (willShow) {
-		// if (doc.activeElement !== _input)
-		lastActiveEl = doc.activeElement;
-	}
-	_container.style.display = willShow ? "block" : "none";
-	_input[willShow ? "focus" : "blur"]();
-}
 function listenGlobalEvents() {
+	win.addEventListener("keydown", (e) => {
+		console.log("winkeydown");
+		if ($isInput(doc.activeElement)) return;
+		if (isShortcut(e, "MKB.shortcut")) toggleMKB();
+	});
 	win.addEventListener("touchstart", (e) => {
 		if (e.touches.length >= 3) {
 			toggleMKB();
@@ -99,6 +94,108 @@ function listenGlobalEvents() {
 		}
 	});
 }
+function toggleMKB() {
+	const willShow = !isShowing();
+	if (willShow) {
+		if (doc.activeElement !== _input) lastActiveEl = doc.activeElement;
+	}
+	_container.style.display = willShow ? "block" : "none";
+	// console.log("togglemkb", willShow);
+	_input[willShow ? "focus" : "blur"]();
+	console.log(willShow);
+}
+function addMKBListeners(el) {
+	el.addEventListener("blur", toggleMKB);
+	el.addEventListener("keydown", (e) => {
+		console.log("elkeydown");
+
+		if (
+			e.key === "Shift" ||
+			e.key === "Meta" ||
+			e.key === "Alt" ||
+			e.key === "Control"
+		)
+			return;
+		const mods = getModifierObj(e);
+		if (isShortcut(e, "MKB.shortcut", mods)) return toggleMKB();
+		el.blur(); //triggers toggleMKB (without endless loop)
+		if (lastActiveEl && lastActiveEl.nodeName === "INPUT")
+			lastActiveEl.focus();
+		// console.log(doc.activeElement);
+		//key casing:  key combo's w/ modifiers don't trigger unless lowercase...
+		const isNamedKey = !(namedKeys.indexOf(e.key) === -1);
+		triggerKeyDown(
+			(mods.cmd || mods.opt || mods.ctrl) && !isNamedKey
+				? e.key.toLowerCase()
+				: (mods.shift && !isNamedKey && e.key.toUpperCase()) || e.key,
+			mods
+		);
+		//refocus MKB,  but don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
+		if (!(e.key === "/" && !mods.shift && !mods.ctrl && !mods.opt && !mods.cmd)) toggleMKB(); // prettier-ignore
+		setTimeout(() => (el.value = ""), 167);
+	});
+	el.addEventListener("keyup", (e) => {});
+}
+function addMKNModBtnListeners(btn) {
+	const btnDown = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+	};
+	const btnUp = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!btn.classList.contains("_modSelected"))
+			btn.classList.add("_modSelected");
+		else btn.classList.remove("_modSelected");
+	};
+	btn.addEventListener("touchstart", btnDown);
+	btn.addEventListener("touchend", btnUp);
+	btn.addEventListener("mousedown", btnDown);
+	btn.addEventListener("mouseup", btnUp);
+}
+
+/*
+	UI
+*/
+
+function $input() {
+	const el = doc.createElement("input");
+	el.classList.add("mkb-input");
+	el.placeholder = "Enter a shortcut...";
+	addMKBListeners(el);
+	return el;
+}
+function $modifierBtns() {
+	const el = doc.createElement("div");
+	el.classList.add("mkb-modifiers");
+	for (const label in modifierBtns) {
+		const btn = doc.createElement("button");
+		btn.innerHTML = label;
+		addMKNModBtnListeners(btn);
+		el.appendChild(btn);
+	}
+	return el;
+}
+function $overlay() {
+	const el = doc.createElement("div");
+	el.classList.add("mkb-overlay");
+	return el;
+}
+function $container() {
+	const el = doc.createElement("div");
+	el.id = "mkb-container";
+	_input = $input();
+	el.appendChild($overlay());
+	el.appendChild(_input);
+	el.appendChild($modifierBtns());
+	return el;
+}
+
+/*
+	utilities
+*/
+const isShowing = () => _container.style.display !== "none";
+
 function getModifierObj(e) {
 	const modObj = {};
 	//determine if shifted char
@@ -120,82 +217,14 @@ function getModifierObj(e) {
 	});
 	return modObj;
 }
-function $input() {
-	const el = doc.createElement("input");
-	el.classList.add("mkb-input");
-	el.placeholder = "Enter a shortcut...";
-	el.addEventListener("blur", toggleMKB);
-	el.addEventListener("keyup", (e) => {
-		if (e.key === "Shift") return;
-		el.blur(); //triggers toggleMKB (without endless loop)
-		if (lastActiveEl && lastActiveEl.nodeName === "INPUT")
-			lastActiveEl.focus();
-		// console.log(doc.activeElement);
-		const mods = getModifierObj(e);
-		//key casing:  key combo's w/ modifiers don't trigger unless lowercase...
-		const isNamedKey = !(namedKeys.indexOf(e.key) === -1);
-		console.log(e.key, isNamedKey, mods);
-		triggerKeyDown(
-			(mods.cmd || mods.opt || mods.ctrl) && !isNamedKey
-				? e.key.toLowerCase()
-				: (mods.shift && !isNamedKey && e.key.toUpperCase()) || e.key,
-			mods
-		);
-		//refocus MKB,  but don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
-		if (!(e.key === "/" && !mods.shift && !mods.ctrl && !mods.opt && !mods.cmd)) toggleMKB(); // prettier-ignore
-		setTimeout(() => (el.value = ""), 167);
-	});
-	return el;
-}
-function $modifierBtns() {
-	const el = doc.createElement("div");
-	el.classList.add("mkb-modifiers");
-	for (const label in modifierBtns) {
-		const btn = doc.createElement("button");
-		btn.innerHTML = label;
-		const btnDown = (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-		};
-		const btnUp = (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			if (!btn.classList.contains("_modSelected"))
-				btn.classList.add("_modSelected");
-			else btn.classList.remove("_modSelected");
-		};
-		btn.addEventListener("touchstart", btnDown);
-		btn.addEventListener("touchend", btnUp);
-		btn.addEventListener("mousedown", btnDown);
-		btn.addEventListener("mouseup", btnUp);
-		el.appendChild(btn);
-	}
-	return el;
-}
-function $overlay() {
-	const el = doc.createElement("div");
-	el.classList.add("mkb-overlay");
-	return el;
-}
-function $container() {
-	const el = doc.createElement("div");
-	el.id = "mkb-container";
-	_input = $input();
-	el.appendChild($overlay());
-	el.appendChild(_input);
-	el.appendChild($modifierBtns());
-	return el;
-}
 
-/* init */
+/* userscript init */
 (function () {
 	("use strict");
 	console.log("⌨️💪📱");
-	win.toggleMKB = toggleMKB;
 	addStyleSheet();
 	_container = $container();
 	_container.style.display = "none";
 	bod.appendChild(_container);
 	listenGlobalEvents();
-	// setTimeout(() => toggleMKB(), 2000); // # force show on page load
 })();

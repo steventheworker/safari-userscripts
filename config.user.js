@@ -12,6 +12,9 @@
 // ==/UserScript==
 
 const DefaultConfig = {
+	MKB: {
+		shortcut: ["meta", "alt", "ctrl", "k"], // ctrl + opt + cmd + k
+	},
 	site_dict: {
 		A: "apple.stackexchange.com",
 		R: "reddit.com",
@@ -23,6 +26,12 @@ const DefaultConfig = {
 };
 const Config = {}; //todo: somehow load config from localStorage? cloud? drive?
 
+// add global fn's to window
+function addGlobalFns() {
+	win.$isInput = $isInput; // is? input, textarea, div[contenteditable=true]
+	win.triggerKeyDown = triggerKeyDown; // used to remap keys / sending keyboard shortcuts on mobile (AKA mobile keyboarding)
+	win.isShortcut = isShortcut; // check if event triggers a shortcut (w/ path format (eg: "MKB.shortcut" => Config.MKB.shortcut ))
+}
 // init fn (first fn to run)
 function defineGlobals() {
 	if (!window.win) window.win = window;
@@ -35,11 +44,6 @@ function defineGlobals() {
 	if (doc.readyState !== "loading") win.bod = doc.body;
 	else doc.addEventListener("DOMContentLoaded", () => (win.bod = doc.body));
 	addGlobalFns();
-}
-// add global fn's to window
-function addGlobalFns() {
-	win.$isInput = $isInput;
-	win.triggerKeyDown = triggerKeyDown;
 }
 
 /*
@@ -105,6 +109,8 @@ function globalEvents() {
 	utilities fn's -  global fn dependencies
 */
 /* triggering keys */
+const CONVERTWEBMODS = {cmd: "meta", meta: "meta", opt: "alt", alt: "alt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
+const CONVERTMACMODS = {cmd: "cmd", meta: "cmd", opt: "opt", alt: "opt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
 const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
 const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
 function getKeyCode(key) {
@@ -117,13 +123,33 @@ function getCharCode(key) {
 	if (dict) return dict;
 	return key.charCodeAt(0);
 }
-/* ... */
+/* miscellaneous */
+function objKeyPath(obj = {}, keyPath, val = null, remove) {
+	const paths = keyPath.split(".");
+	const numPaths = paths.length;
+	for (let i in paths) {
+		const p = paths[i];
+		if (i == paths.length - 1) {
+			if (remove) delete obj[p];
+			else if (val) obj[p] = val;
+		}
+		if (obj) obj = obj[p];
+	}
+	return obj;
+}
+const readKeyPath = (obj, keyPath) => objKeyPath.apply(null, [obj, keyPath]);
+const setKeyPath = (obj = {}, keyPath, val) =>
+	objKeyPath.apply(null, ...arguments);
+const deleteKeyPath = (obj, keyPath) =>
+	objKeyPath.apply(null, [...arguments, null, true]);
+const readConfig = (keyPath) => readKeyPath(Config, keyPath);
+const setConfig = (keyPath, val) => setKeyPath(Config, keyPath, val);
+const deleteConfig = (keyPath) => deleteKeyPath(Config, keyPath, null, true);
 
 /*
 	global fn's
 */
 function triggerKeyDown(key, modifiers = {}) {
-	console.log(key);
 	const keyCode = getCharCode(key); // wrong for .,
 	const ev = new KeyboardEvent("keydown", {
 		altKey: modifiers.alt || modifiers.opt ? true : false,
@@ -164,4 +190,18 @@ function $isInput(el) {
 	)
 		return true;
 	return false;
+}
+function isShortcut(e, path, virtualMods = {}) {
+	let shortcut = readConfig(path);
+	if (!shortcut) return;
+	shortcut = [...shortcut]; // create copy, don't modify reference
+	return (
+		e.key === shortcut.pop() && // shortcuts begin with modifier keys (last in shortcut is always the e.key)
+		!shortcut.filter((modifier, i) =>
+			e[CONVERTWEBMODS[modifier] + "Key"] ||
+			virtualMods[CONVERTMACMODS[modifier]]
+				? false
+				: true
+		).length
+	);
 }
