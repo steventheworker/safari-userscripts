@@ -102,18 +102,26 @@ function globalEvents() {
 })();
 
 /*
+	utilities fn's -  global fn dependencies
+*/
+/* triggering keys */
+const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
+const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
+function getKeyCode(key) {
+	const dict = KeyCodeDict[key];
+	if (dict) return dict;
+	return isNaN(key) ? "Key" + key.toUpperCase() : "Digit" + key;
+}
+function getCharCode(key) {
+	const dict = CharCodeDict[key];
+	if (dict) return dict;
+	return key.charCodeAt(0);
+}
+/* ... */
+
+/*
 	global fn's
 */
-function $isInput(el) {
-	const nn = el.nodeName;
-	if (
-		nn === "INPUT" ||
-		nn === "TEXTAREA" ||
-		(nn === "DIV" && el.contentEditable === "true")
-	)
-		return true;
-	return false;
-}
 function triggerKeyDown(key, modifiers = {}) {
 	console.log(key);
 	const keyCode = getCharCode(key); // wrong for .,
@@ -147,20 +155,13 @@ function triggerKeyDown(key, modifiers = {}) {
 		: document.body
 	).dispatchEvent(ev);
 }
-
-/*
-	utilities fn's -  global fn dependencies
-*/
-/* triggering keys */
-const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
-const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
-function getKeyCode(key) {
-	const dict = KeyCodeDict[key];
-	if (dict) return dict;
-	return isNaN(key) ? "Key" + key.toUpperCase() : "Digit" + key;
-}
-function getCharCode(key) {
-	const dict = CharCodeDict[key];
-	if (dict) return dict;
-	return key.charCodeAt(0);
+function $isInput(el) {
+	const nn = el.nodeName;
+	if (
+		nn === "INPUT" ||
+		nn === "TEXTAREA" ||
+		(nn === "DIV" && el.contentEditable === "true")
+	)
+		return true;
+	return false;
 }

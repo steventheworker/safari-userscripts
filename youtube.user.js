@@ -215,7 +215,7 @@ function ListenEvents() {
 				}); //pgup
 				if (e.key === "i") e.stopImmediatePropagation();
 			}
-			if (e.key === "a") triggerKeyDown("LeftArrow"); //map to rewind
+			if (e.key === "a") triggerKeyDown("ArrowLeft"); //map to rewind
 			if ((e.key === "s" || e.key === "k") && !e.metaKey) {
 				if (e.key === "k") e.stopImmediatePropagation();
 				win.scroll({
@@ -224,7 +224,7 @@ function ListenEvents() {
 					behavior: "smooth",
 				}); //pgdn
 			}
-			if (e.key === "d") triggerKeyDown("RightArrow"); //map to forward
+			if (e.key === "d") triggerKeyDown("ArrowRight"); //map to forward
 
 			//[ ] playback speed
 			if (e.key === "[") triggerKeyDown(",", { shift: true });
