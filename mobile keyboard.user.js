@@ -13,7 +13,7 @@ const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" }
 const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?"]; // prettier-ignore
 const namedKeys = [" ", "Enter", "Tab", "Delete", "Backspace", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Escape"]; // prettier-ignore
 let _input, _container; //dom references
-win.lastActiveEl = null; //used by triggerKeyDown (config.user.js)
+win.lastActiveEl = null; //used by triggerKeyPress (config.user.js)
 
 function addStyleSheet() {
 	const css = `
@@ -42,7 +42,9 @@ function addStyleSheet() {
 			background: black;
 			color: white;
 		 }
-		 .mkb-modifiers {
+
+		 /* Shift Ctrl Opt Cmd  &  key buttons (Esc, Tab, F1-F12) */
+		 .mkb-modifiers, .mkb-keyBtns {
 			position: absolute;
 			bottom: 25%;
 			margin: 0.5rem;
@@ -50,7 +52,7 @@ function addStyleSheet() {
 			width: 25%;
 			height: 1.9rem;
 		 }
-		 .mkb-modifiers button {
+		 .mkb-modifiers button, .mkb-keyBtns button {
 			float: right;
 			width: 24%;
 			margin: 0;
@@ -63,12 +65,14 @@ function addStyleSheet() {
 			border: none;
 			outline: 1px solid grey !important;
 		 }
-		 .mkb-modifiers button:last-child { /* shift key btn */
+		 .mkb-modifiers button:last-child, .mkb-keyBtns button { /* shift key btn */
 			padding-left: 0.75em;
 			text-align: left;
 		 }
-		 ._modSelected {
-			background: darkgreen !important;
+		 ._modSelected {background: darkgreen !important;}
+		 .mkb-keyBtns {
+			bottom: calc(25% + 1.9rem);
+			text-align: right;
 		 }
    `,
 		head = doc.head || doc.getElementsByTagName("head")[0],
@@ -120,7 +124,7 @@ function addMKBListeners(el) {
 		// console.log(doc.activeElement);
 		//key casing:  key combo's w/ modifiers don't trigger unless lowercase...
 		const isNamedKey = !(namedKeys.indexOf(e.key) === -1);
-		triggerKeyDown(
+		triggerKeyPress(
 			(mods.cmd || mods.opt || mods.ctrl) && !isNamedKey
 				? e.key.toLowerCase()
 				: (mods.shift && !isNamedKey && e.key.toUpperCase()) || e.key,
@@ -149,11 +153,27 @@ function addMKNModBtnListeners(btn) {
 	btn.addEventListener("mousedown", btnDown);
 	btn.addEventListener("mouseup", btnUp);
 }
+function addMKNKeyBtnListeners(btn) {
+	const btnDown = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		btn.style.background = "darkred";
+	};
+	const btnUp = (e) => {
+		btn.style.background = "";
+		e.preventDefault();
+		e.stopPropagation();
+		triggerKeyPress(btn.dataset.key, getModifierObj());
+	};
+	btn.addEventListener("touchstart", btnDown);
+	btn.addEventListener("touchend", btnUp);
+	btn.addEventListener("mousedown", btnDown);
+	btn.addEventListener("mouseup", btnUp);
+}
 
 /*
 	UI
 */
-
 function $input() {
 	const el = doc.createElement("input");
 	el.classList.add("mkb-input");
@@ -166,10 +186,24 @@ function $modifierBtns() {
 	el.classList.add("mkb-modifiers");
 	for (const label in modifierBtns) {
 		const btn = doc.createElement("button");
-		btn.innerHTML = label;
+		btn.appendChild(doc.createTextNode(label));
 		addMKNModBtnListeners(btn);
 		el.appendChild(btn);
 	}
+	return el;
+}
+function makeKeyBtn(key) {
+	const btn = doc.createElement("button");
+	btn.appendChild(doc.createTextNode(key.slice(0, 3).toLowerCase()));
+	btn.setAttribute("data-key", key);
+	addMKNKeyBtnListeners(btn);
+	return btn;
+}
+function $keyBtns() {
+	const el = doc.createElement("div");
+	el.classList.add("mkb-keyBtns");
+	el.appendChild(makeKeyBtn("Escape"));
+	el.appendChild(makeKeyBtn("Tab"));
 	return el;
 }
 function $overlay() {
@@ -184,6 +218,7 @@ function $container() {
 	el.appendChild($overlay());
 	el.appendChild(_input);
 	el.appendChild($modifierBtns());
+	el.appendChild($keyBtns());
 	return el;
 }
 
@@ -193,20 +228,23 @@ function $container() {
 const isShowing = () => _container.style.display !== "none";
 function getModifierObj(e) {
 	const modObj = {};
-	//determine if shifted char
-	if (e.code.startsWith("Digit"))
-		modObj.shift = e.code.slice(-1) === e.key ? false : true;
-	else if (e.code.startsWith("Key"))
-		modObj.shift = e.key.toUpperCase() === e.key ? true : false;
-	else
-		modObj.shift =
-			upperCaseDict.indexOf(e.key) !== -1 &&
-			namedKeys.indexOf(e.key) === -1;
-	if (e.shiftKey) modObj.shift = true;
-
-	//other modifiers
-	const btnsSelected = Array.from(doc.getElementsByClassName("_modSelected"));
-	btnsSelected.forEach((el, i) => {
+	if (e) {
+		//determine if shifted char
+		if (e.code.startsWith("Digit"))
+			modObj.shift = e.code.slice(-1) === e.key ? false : true;
+		else if (e.code.startsWith("Key"))
+			modObj.shift = e.key.toUpperCase() === e.key ? true : false;
+		else
+			modObj.shift =
+				upperCaseDict.indexOf(e.key) !== -1 &&
+				namedKeys.indexOf(e.key) === -1;
+		if (e.shiftKey) modObj.shift = true;
+		if (e.ctrlKey) modObj.ctrl = true;
+		if (e.altKey) modObj.opt = true;
+		if (e.metaKey) modObj.cmd = true;
+	}
+	//button modifiers
+	Array.from(doc.getElementsByClassName("_modSelected")).forEach((el, i) => {
 		modObj[modifierBtns[el.innerHTML]] = true;
 		el.classList.remove("_modSelected");
 	});
@@ -222,4 +260,5 @@ function getModifierObj(e) {
 	_container.style.display = "none";
 	bod.appendChild(_container);
 	listenGlobalEvents();
+	toggleMKB();
 })();

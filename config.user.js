@@ -27,13 +27,22 @@ const DefaultConfig = {
 		U: "unix.stackexchange.com",
 	},
 };
+
 const Config = {}; //todo: somehow load config from localStorage? cloud? drive?
+// keyboard constants
+const CONVERTWEBMODS = {cmd: "meta", meta: "meta", opt: "alt", alt: "alt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
+const CONVERTMACMODS = {cmd: "cmd", meta: "cmd", opt: "opt", alt: "opt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
+const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
+const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
+let settingsDrawn = false;
 
 // add global fn's to window
 function addGlobalFns() {
 	win.NSLog = (...a) => console.log.apply(null, a); // easier to autocomplete nickname
 	win.$isInput = $isInput; // is? input, textarea, div[contenteditable=true]
 	win.triggerKeyDown = triggerKeyDown; // used to remap keys / sending keyboard shortcuts on mobile (AKA mobile keyboarding)
+	win.triggerKeyUp = triggerKeyUp;
+	win.triggerKeyPress = triggerKeyPress;
 	win.isShortcut = isShortcut; // check if event triggers a shortcut (w/ path format (eg: "MKB.shortcut" => Config.MKB.shortcut ))
 }
 // init fn (first fn to run)
@@ -53,8 +62,6 @@ function defineGlobals() {
 /*
 	Control Panel UI (cmd + opt + ctrl + Comma)
 */
-let settingsDrawn = false;
-const loadConfig = () => Object.assign(Config, DefaultConfig);
 function settingsContents() {
 	const container = doc.createElement("div");
 	//todo: container.append setting 1.. setting 2.. etc...
@@ -101,22 +108,10 @@ function globalEvents() {
 	});
 }
 
-//userscript init
-(function () {
-	"use strict";
-	loadConfig();
-	defineGlobals();
-	globalEvents();
-})();
-
 /*
 	utilities fn's -  global fn dependencies
 */
 /* triggering keys */
-const CONVERTWEBMODS = {cmd: "meta", meta: "meta", opt: "alt", alt: "alt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
-const CONVERTMACMODS = {cmd: "cmd", meta: "cmd", opt: "opt", alt: "opt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
-const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
-const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
 function getKeyCode(key) {
 	const dict = KeyCodeDict[key];
 	if (dict) return dict;
@@ -127,35 +122,20 @@ function getCharCode(key) {
 	if (dict) return dict;
 	return key.charCodeAt(0);
 }
-/* miscellaneous */
-function objKeyPath(obj = {}, keyPath, val = null, remove) {
-	const paths = keyPath.split(".");
-	const numPaths = paths.length;
-	for (let i in paths) {
-		const p = paths[i];
-		if (i == paths.length - 1) {
-			if (remove) delete obj[p];
-			else if (val) obj[p] = val;
-		}
-		if (obj) obj = obj[p];
-	}
-	return obj;
-}
-const readKeyPath = (obj, keyPath) => objKeyPath.apply(null, [obj, keyPath]);
-const setKeyPath = (obj = {}, keyPath, val) =>
-	objKeyPath.apply(null, ...arguments);
-const deleteKeyPath = (obj, keyPath) =>
-	objKeyPath.apply(null, [...arguments, null, true]);
-const readConfig = (keyPath) => readKeyPath(Config, keyPath);
-const setConfig = (keyPath, val) => setKeyPath(Config, keyPath, val);
-const deleteConfig = (keyPath) => deleteKeyPath(Config, keyPath, null, true);
 
 /*
 	global fn's
 */
+const triggerKeyUp = (...a) => triggerKeyDown.apply(null, [...a, true]);
+const triggerKeyPress = (...a) => {
+	triggerKeyDown.apply(null, a);
+	triggerKeyUp.apply(null, a);
+};
 function triggerKeyDown(key, modifiers = {}) {
+	const type = arguments[2] ? "keyup" : "keydown";
+	const tar = modifiers.target || lastActiveEl;
 	const keyCode = getCharCode(key); // wrong for .,
-	const ev = new KeyboardEvent("keydown", {
+	const ev = new KeyboardEvent(type, {
 		altKey: modifiers.alt || modifiers.opt ? true : false,
 		bubbles: true,
 		cancelBubble: false,
@@ -164,7 +144,7 @@ function triggerKeyDown(key, modifiers = {}) {
 		code: getKeyCode(key),
 		composed: true,
 		ctrlKey: modifiers.ctrl ? true : false,
-		currentTarget: lastActiveEl || null,
+		currentTarget: tar || null,
 		defaultPrevented: true,
 		detail: 0,
 		eventPhase: 0,
@@ -177,13 +157,11 @@ function triggerKeyDown(key, modifiers = {}) {
 		repeat: false,
 		returnValue: false,
 		shiftKey: modifiers.shift ? true : false,
-		type: "keydown",
+		type,
 		which: keyCode,
 	});
-	(lastActiveEl && lastActiveEl !== doc.activeElement
-		? lastActiveEl
-		: document.body
-	).dispatchEvent(ev);
+	if (modifiers.target) return tar.dispatchEvent(ev); // force a target
+	(tar && tar !== doc.activeElement ? tar : document.body).dispatchEvent(ev);
 }
 function $isInput(el) {
 	const nn = el.nodeName;
@@ -209,3 +187,35 @@ function isShortcut(e, path, virtualMods = {}) {
 		).length
 	);
 }
+
+/* miscellaneous */
+function objKeyPath(obj = {}, keyPath, val = null, remove) {
+	const paths = keyPath.split(".");
+	const numPaths = paths.length;
+	for (let i in paths) {
+		const p = paths[i];
+		if (i == paths.length - 1) {
+			if (remove) delete obj[p];
+			else if (val) obj[p] = val;
+		}
+		if (obj) obj = obj[p];
+	}
+	return obj;
+}
+const readKeyPath = (obj, keyPath) => objKeyPath.apply(null, [obj, keyPath]);
+const setKeyPath = (obj = {}, keyPath, val) =>
+	objKeyPath.apply(null, ...arguments);
+const deleteKeyPath = (obj, keyPath) =>
+	objKeyPath.apply(null, [...arguments, null, true]);
+const readConfig = (keyPath) => readKeyPath(Config, keyPath);
+const setConfig = (keyPath, val) => setKeyPath(Config, keyPath, val);
+const deleteConfig = (keyPath) => deleteKeyPath(Config, keyPath, null, true);
+const loadConfig = () => Object.assign(Config, DefaultConfig);
+
+//userscript init
+(function () {
+	"use strict";
+	loadConfig();
+	defineGlobals();
+	globalEvents();
+})();
