@@ -225,7 +225,8 @@ function ListenEvents() {
 				}); //pgdn
 			}
 			if (e.key === "d" || e.key === "l") triggerKeyDown("ArrowRight"); //map to forward
-			if (e.key === "l" || e.key === "j") e.stopPropagation(); //map to Arrow's (5 sec fast-forward/rewind, rather than 10 sec)
+			if (e.key === "l" || e.key === "j" || e.key === "d")
+				e.stopPropagation(); //prevent default / map to Arrow's (5 sec fast-forward/rewind, rather than 10 sec)
 
 			//[ ] playback speed
 			if (e.key === "[") triggerKeyDown(",", { shift: true });
