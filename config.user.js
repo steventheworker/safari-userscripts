@@ -3,7 +3,7 @@
 // @name         Config (Globals) / Debugging
 // @namespace    github.com/steventheworker
 // @version      0.1
-// @description  High priority global userscript with debug helper functions
+// @description  Highest priority global userscript with global variables, debug / helper functions
 // @author       steventheworker
 // @match        *://*/*
 // @grant        none
@@ -12,6 +12,9 @@
 // ==/UserScript==
 
 const DefaultConfig = {
+	ControlPanel: {
+		shortcut: ["meta", "alt", "ctrl", ","], // ctrl + opt + cmd + ,
+	},
 	MKB: {
 		shortcut: ["meta", "alt", "ctrl", "k"], // ctrl + opt + cmd + k
 	},
@@ -48,7 +51,7 @@ function defineGlobals() {
 }
 
 /*
-	settings UI (cmd + opt + ctrl + Comma)
+	Control Panel UI (cmd + opt + ctrl + Comma)
 */
 let settingsDrawn = false;
 const loadConfig = () => Object.assign(Config, DefaultConfig);
@@ -94,7 +97,7 @@ function openSettings() {
 function globalEvents() {
 	//open settings with (cmd+opt+ctrl+Comma)
 	win.addEventListener("keydown", (e) => {
-		if (e.key === "," && e.metaKey && e.altKey && e.ctrlKey) openSettings();
+		if (isShortcut(e, "ControlPanel.shortcut")) openSettings();
 	});
 }
 
