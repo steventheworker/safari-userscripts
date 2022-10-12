@@ -83,7 +83,6 @@ function addStyleSheet() {
 */
 function listenGlobalEvents() {
 	win.addEventListener("keydown", (e) => {
-		console.log("winkeydown");
 		if ($isInput(doc.activeElement)) return;
 		if (isShortcut(e, "MKB.shortcut")) toggleMKB();
 	});
@@ -102,13 +101,10 @@ function toggleMKB() {
 	_container.style.display = willShow ? "block" : "none";
 	// console.log("togglemkb", willShow);
 	_input[willShow ? "focus" : "blur"]();
-	console.log(willShow);
 }
 function addMKBListeners(el) {
 	el.addEventListener("blur", toggleMKB);
 	el.addEventListener("keydown", (e) => {
-		console.log("elkeydown");
-
 		if (
 			e.key === "Shift" ||
 			e.key === "Meta" ||
@@ -195,7 +191,6 @@ function $container() {
 	utilities
 */
 const isShowing = () => _container.style.display !== "none";
-
 function getModifierObj(e) {
 	const modObj = {};
 	//determine if shifted char

@@ -28,6 +28,7 @@ const Config = {}; //todo: somehow load config from localStorage? cloud? drive?
 
 // add global fn's to window
 function addGlobalFns() {
+	win.NSLog = (...a) => console.log.apply(null, a); // easier to autocomplete nickname
 	win.$isInput = $isInput; // is? input, textarea, div[contenteditable=true]
 	win.triggerKeyDown = triggerKeyDown; // used to remap keys / sending keyboard shortcuts on mobile (AKA mobile keyboarding)
 	win.isShortcut = isShortcut; // check if event triggers a shortcut (w/ path format (eg: "MKB.shortcut" => Config.MKB.shortcut ))
