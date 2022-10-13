@@ -29,7 +29,7 @@ function addStyleSheet() {
 		 .mkb-overlay {
 			 width: 100%;
 			 height: 100%;
-			 background: rgba(0, 127.5, 127.5, 0.3);
+			 background: rgba(127.5, 127.5, 127.5, 0.3);
 		 }
 		 .mkb-input {
 			font-size: 1.9rem;
@@ -192,7 +192,9 @@ function addMKNKeyBtnListeners(btn) {
 		btn.style.background = "";
 		e.preventDefault();
 		e.stopPropagation();
+		_input.blur();
 		triggerKeyPress(btn.dataset.key, getModifierObj());
+		if (btn.dataset.key !== "Escape") toggleMKB();
 	};
 	btn.addEventListener("touchstart", btnDown);
 	btn.addEventListener("touchend", btnUp);
