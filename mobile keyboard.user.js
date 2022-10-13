@@ -8,22 +8,21 @@
 // @grant        none
 // ==/UserScript==
 
-const modifierBtns = { "⌘": "cmd", "⌥": "opt", "^": "ctrl", shift: "shift" };
+const modifierBtns = { shift: "shift", "^": "ctrl", "⌥": "opt", "⌘": "cmd" };
 // const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/"]; // prettier-ignore
 const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?"]; // prettier-ignore
 const namedKeys = [" ", "Enter", "Tab", "Delete", "Backspace", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Escape"]; // prettier-ignore
-let _input, _container; //dom references
-win.lastActiveEl = null; //used by triggerKeyPress (config.user.js)
+let _input, _container, h0, scrollYWhenMKBOpened; //dom references
 
 function addStyleSheet() {
 	const css = `
 		 /* mobile keyboard */
        #mkb-container {
-			 position: fixed;
-			 bottom: 0;
+			 position: fixed !important;
+			 top: 0;
 			 left: 0;
 			 width: 100%;
-			 height: 100%;
+			 height: 100vh;
 			 z-index: 2147483647;
 		 }
 		 .mkb-overlay {
@@ -36,7 +35,7 @@ function addStyleSheet() {
 			width: 50%;
 			margin-left: 25%;
 			position: absolute;
-			bottom: 25%;
+			top: 25%;
 			box-sizing: border-box;
 			padding: 0.5rem;
 			background: black;
@@ -46,14 +45,14 @@ function addStyleSheet() {
 		 /* Shift Ctrl Opt Cmd  &  key buttons (Esc, Tab, F1-F12) */
 		 .mkb-modifiers, .mkb-keyBtns {
 			position: absolute;
-			bottom: 25%;
+			top: 25%;
 			margin: 0.5rem;
 			margin-left: 50%;
 			width: 25%;
 			height: 1.9rem;
+			text-align: right;
 		 }
 		 .mkb-modifiers button, .mkb-keyBtns button {
-			float: right;
 			width: 24%;
 			margin: 0;
 			margin-right: 0.5%;
@@ -71,8 +70,7 @@ function addStyleSheet() {
 		 }
 		 ._modSelected {background: darkgreen !important;}
 		 .mkb-keyBtns {
-			bottom: calc(25% + 1.9rem);
-			text-align: right;
+			top: calc(25% - 1.9rem);
 		 }
    `,
 		head = doc.head || doc.getElementsByTagName("head")[0],
@@ -96,10 +94,19 @@ function listenGlobalEvents() {
 			e.preventDefault();
 		}
 	});
+	win.addEventListener("scroll", (e) => {
+		if (!isShowing()) return;
+		let marginTop = window.scrollY - scrollYWhenMKBOpened;
+		const h = parseFloat(_container.style.height);
+		marginTop = Math.abs(marginTop) <= h ? marginTop : h;
+		if (!marginTop) return;
+		_container.style.marginTop = marginTop + "px";
+	});
 }
 function toggleMKB() {
 	const willShow = !isShowing();
 	if (willShow) {
+		adjustToKeyboard();
 		if (doc.activeElement !== _input) lastActiveEl = doc.activeElement;
 	}
 	_container.style.display = willShow ? "block" : "none";
@@ -117,6 +124,7 @@ function addMKBListeners(el) {
 		)
 			return;
 		const mods = getModifierObj(e);
+		console.log(e);
 		if (isShortcut(e, "MKB.shortcut", mods)) return toggleMKB();
 		el.blur(); //triggers toggleMKB (without endless loop)
 		if (lastActiveEl && lastActiveEl.nodeName === "INPUT")
@@ -250,15 +258,47 @@ function getModifierObj(e) {
 	});
 	return modObj;
 }
+function adjustContainer(dH) {
+	const newH = h0 - dH;
+	_container.style.height = newH + "px";
+}
+// let noResizeCount = 0,
+// 	prevDH = 0;
+function adjustToKeyboard() {
+	// const h1 = win.visualViewport.height;
+	// const dH = h0 - h1;
+	// const sameDiff = dH === prevDH;
+	// prevDH = dH;
+	// if (!sameDiff) {
+	// 	noResizeCount = 0;
+	// 	adjustContainer(dH);
+	// } else if (++noResizeCount == 4) {
+	// 	noResizeCount = 0;
+	// 	prevDH = 0;
+	// 	return;
+	// }
+	// return setTimeout(adjustToKeyboard, 75);
+
+	// wait for keyboard to finish opening
+	setTimeout(() => {
+		const dH = h0 - win.visualViewport.height;
+		if (dH) adjustContainer(dH);
+		scrollYWhenMKBOpened = window.scrollY;
+	}, 750);
+}
 
 /* userscript init */
 (function () {
 	("use strict");
 	console.log("⌨️💪📱");
-	addStyleSheet();
-	_container = $container();
-	_container.style.display = "none";
-	bod.appendChild(_container);
-	listenGlobalEvents();
-	toggleMKB();
+	onPageLoaded(() => {
+		addStyleSheet();
+		_container = $container();
+		_container.style.display = "none";
+		bod.appendChild(_container);
+		listenGlobalEvents();
+		h0 = win.visualViewport.height;
+		console.log(h0);
+		// setTimeout(toggleMKB, 333); // reveal on page load
+	});
 })();

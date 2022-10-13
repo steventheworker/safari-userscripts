@@ -8,15 +8,16 @@
 // @match        *://*/*
 // @grant        none
 // @priority     1
+// @weight		  999
 // @run-at       document-start
 // ==/UserScript==
 
 const DefaultConfig = {
 	ControlPanel: {
-		shortcut: ["meta", "alt", "ctrl", ","], // ctrl + opt + cmd + ,
+		shortcut: ["ctrl", "opt", "cmd", ","], //  AKA ["ctrl", "alt", "meta", ","]       OR      CTRL + ALT + META + ,   AKA   CTRL + OPT + CMD + ,
 	},
 	MKB: {
-		shortcut: ["meta", "alt", "ctrl", "k"], // ctrl + opt + cmd + k
+		shortcut: ["ctrl", "opt", "cmd", "k"],
 	},
 	site_dict: {
 		A: "apple.stackexchange.com",
@@ -29,15 +30,17 @@ const DefaultConfig = {
 };
 
 const Config = {}; //todo: somehow load config from localStorage? cloud? drive?
-// keyboard constants
+const loadConfig = () => Object.assign(Config, DefaultConfig);
+// keyboard constants / MKB definitions
 const CONVERTWEBMODS = {cmd: "meta", meta: "meta", opt: "alt", alt: "alt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
 const CONVERTMACMODS = {cmd: "cmd", meta: "cmd", opt: "opt", alt: "opt", ctrl: "ctrl", shift: "shift"}; // prettier-ignore
-const KeyCodeDict = {" ": "Space", "Tab": "Tab", "`": "Backquote", "~": "Backquote", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
-const CharCodeDict = {" ": 32, "Tab": 9, "`": 192, "~": 192, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40 }; // prettier-ignore
+const KeyCodeDict = {"Escape": "Escape", "`": "Backquote", "~": "Backquote", "Tab": "Tab", " ": "Space", "-": "Minus", "_": "Minus", "=": "Equal", "+": "Equal", "Delete": "Delete", "Backspace": "Backspace", "[": "BracketLeft", "{": "BracketLeft", "]": "BracketLeft", "}": "BracketLeft", "\\": "Backslash", "|": "Backslash", ";": "Semicolon", ":": "Semicolon", "'": "Quote", "\"": "Quote", ",": "Comma", "<": "Comma", ".": "Period", ">": "Period", "/": "Slash", "?": "Slash", "ArrowLeft": "ArrowLeft", "ArrowUp": "ArrowUp", "ArrowRight": "ArrowRight", "ArrowDown": "ArrowDown" }; // prettier-ignore
+const CharCodeDict = {"Escape": 27, "`": 192, "~": 192, "Tab": 9, " ": 32, "-": 173, "_": 173, "=": 61, "+": 61, "Delete": 46, "Backspace": 8, "[": 219, "{": 219, "]": 221, "}": 221, "\\": 220, "|": 220, ";": 59, ":": 59, "'": 222, "\"": 222, ",": 188, "<": 188, ".": 190, ">": 190, "/": 191, "?": 191, "ArrowLeft": 37, "ArrowUp": 38, "ArrowRight": 39, "ArrowDown": 40}; // prettier-ignore
 let settingsDrawn = false;
 
 // add global fn's to window
 function addGlobalFns() {
+	win.onPageLoaded = onPageLoaded;
 	win.NSLog = (...a) => console.log.apply(null, a); // easier to autocomplete nickname
 	win.$isInput = $isInput; // is? input, textarea, div[contenteditable=true]
 	win.triggerKeyDown = triggerKeyDown; // used to remap keys / sending keyboard shortcuts on mobile (AKA mobile keyboarding)
@@ -50,12 +53,13 @@ function defineGlobals() {
 	if (!window.win) window.win = window;
 	else if (win.document !== window.document)
 		alert("houston, we have an issue: @steventheworker/safari-userscripts");
+	if (!win.doc) win.doc = document;
+	//define constants
+	loadConfig();
 	//search a site with shift + Letter (eg: append site:website.com to search query on search engines)
 	win.site_dict = Config.site_dict;
-	if (!win.doc) win.doc = document;
 	//set bod (after doc ready (body isn't defined until DOMContentLoaded))
-	if (doc.readyState !== "loading") win.bod = doc.body;
-	else doc.addEventListener("DOMContentLoaded", () => (win.bod = doc.body));
+	onPageLoaded(() => (win.bod = doc.body));
 	addGlobalFns();
 }
 
@@ -101,6 +105,7 @@ function openSettings() {
 /*
 	global event listeners
 */
+const onPageLoaded = (cb) => doc.readyState !== "loading" ? cb() : doc.addEventListener("DOMContentLoaded", cb); // prettier-ignore
 function globalEvents() {
 	//open settings with (cmd+opt+ctrl+Comma)
 	win.addEventListener("keydown", (e) => {
@@ -133,7 +138,7 @@ const triggerKeyPress = (...a) => {
 };
 function triggerKeyDown(key, modifiers = {}) {
 	const type = arguments[2] ? "keyup" : "keydown";
-	const tar = modifiers.target || lastActiveEl;
+	const tar = modifiers.target || win.lastActiveEl;
 	const keyCode = getCharCode(key); // wrong for .,
 	const ev = new KeyboardEvent(type, {
 		altKey: modifiers.alt || modifiers.opt ? true : false,
@@ -210,12 +215,11 @@ const deleteKeyPath = (obj, keyPath) =>
 const readConfig = (keyPath) => readKeyPath(Config, keyPath);
 const setConfig = (keyPath, val) => setKeyPath(Config, keyPath, val);
 const deleteConfig = (keyPath) => deleteKeyPath(Config, keyPath, null, true);
-const loadConfig = () => Object.assign(Config, DefaultConfig);
 
 //userscript init
 (function () {
 	"use strict";
-	loadConfig();
 	defineGlobals();
+	loadConfig();
 	globalEvents();
 })();

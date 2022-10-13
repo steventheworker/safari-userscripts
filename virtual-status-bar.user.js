@@ -41,7 +41,7 @@ function addStyleSheet() {
 /* init */
 (function () {
 	("use strict");
-	console.log("virtual status bar added ... :) ... :) ... :) ...");
+	console.log("virtual status bar added");
 	addStyleSheet();
 	bod.appendChild($virtualStatusBar());
 })();
