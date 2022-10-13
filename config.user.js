@@ -41,7 +41,7 @@ let settingsDrawn = false;
 // add global fn's to window
 function addGlobalFns() {
 	win.onPageLoaded = onPageLoaded;
-	win.NSLog = (...a) => console.log.apply(null, a); // easier to autocomplete nickname
+	win.NSLog = (...a) => win.console.log.apply(null, a); // easier to autocomplete nickname
 	win.$isInput = $isInput; // is? input, textarea, div[contenteditable=true]
 	win.triggerKeyDown = triggerKeyDown; // used to remap keys / sending keyboard shortcuts on mobile (AKA mobile keyboarding)
 	win.triggerKeyUp = triggerKeyUp;
@@ -50,16 +50,27 @@ function addGlobalFns() {
 }
 // init fn (first fn to run)
 function defineGlobals() {
-	if (!window.win) window.win = window;
-	else if (win.document !== window.document)
-		alert("houston, we have an issue: @steventheworker/safari-userscripts");
-	if (!win.doc) win.doc = document;
+	let _win = window;
+	// try { // iframes - make all windows target the top window
+	// 	_win = window.self !== window.top ? window.top : window;
+	// } catch (e) {
+	// 	// Browsers can block access to window.top due to same origin policy. IE bugs also take place. Here's the working code:
+	// 	_win = window;
+	// }
+	if (window !== _win) return; // if (iframe && tarWin === topmost) break all iframe userscripts (w/o globals)
+	window.win = _win;
+	window.doc = win.document;
+	if (!win.win) win.win = win;
+	if (!win.doc) win.doc = win.document;
 	//define constants
 	loadConfig();
 	//search a site with shift + Letter (eg: append site:website.com to search query on search engines)
 	win.site_dict = Config.site_dict;
 	//set bod (after doc ready (body isn't defined until DOMContentLoaded))
-	onPageLoaded(() => (win.bod = doc.body));
+	onPageLoaded(() => {
+		window.bod = doc.body;
+		win.bod = doc.body;
+	});
 	addGlobalFns();
 }
 

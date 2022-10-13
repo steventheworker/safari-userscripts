@@ -12,7 +12,8 @@ const modifierBtns = { shift: "shift", "^": "ctrl", "⌥": "opt", "⌘": "cmd" }
 // const lowerCaseDict = ["`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/"]; // prettier-ignore
 const upperCaseDict = ["~", "_", "+", "{", "}", "|", ":", '"', "<", ">", "?"]; // prettier-ignore
 const namedKeys = [" ", "Enter", "Tab", "Delete", "Backspace", "ArrowLeft", "ArrowUp", "ArrowRight", "ArrowDown", "Escape"]; // prettier-ignore
-let _input, _container, h0, scrollYWhenMKBOpened; //dom references
+let _input, _container, h0, scrollYWhenMKBOpened, lastScrollY, keyboardHeight; //dom references
+const iosBottomGreynessBuffer = 88;
 
 function addStyleSheet() {
 	const css = `
@@ -28,7 +29,7 @@ function addStyleSheet() {
 		 .mkb-overlay {
 			 width: 100%;
 			 height: 100%;
-			 background: rgba(255, 0, 0, 0.0333);
+			 background: rgba(0, 127.5, 127.5, 0.3);
 		 }
 		 .mkb-input {
 			font-size: 1.9rem;
@@ -94,13 +95,32 @@ function listenGlobalEvents() {
 			e.preventDefault();
 		}
 	});
+	win.addEventListener("resize", (e) => {
+		const kbH = $isInput(doc.activeElement) ? keyboardHeight : 0;
+		h0 = win.visualViewport.height + kbH;
+	});
 	win.addEventListener("scroll", (e) => {
-		if (!isShowing()) return;
-		let marginTop = window.scrollY - scrollYWhenMKBOpened;
+		if (!isShowing() || keyboardHeight === null) return;
+		console.log(_container.style.top);
+		let top = window.scrollY - lastScrollY || scrollYWhenMKBOpened;
 		const h = parseFloat(_container.style.height);
-		marginTop = Math.abs(marginTop) <= h ? marginTop : h;
-		if (!marginTop) return;
-		_container.style.marginTop = marginTop + "px";
+		lastScrollY = window.scrollY;
+		if (top < 0) {
+			// console.log("going up");
+			if (top <= -h) top = -h;
+		} else {
+			// console.log("Going down");
+			top = h - iosBottomGreynessBuffer;
+			if (top >= h) top = h;
+			if (win.visualViewport.width > h0)
+				top = win.visualViewport.height + iosBottomGreynessBuffer + 30; //bottom addressbar is hidden
+			console.log(top);
+		}
+		if (!top) return;
+		_container.style.top = top + "px";
+
+		// let diff = 0;
+		// _container.style.top = diff + "px";
 	});
 }
 function toggleMKB() {
@@ -108,6 +128,7 @@ function toggleMKB() {
 	if (willShow) {
 		adjustToKeyboard();
 		if (doc.activeElement !== _input) lastActiveEl = doc.activeElement;
+		_container.style.top = "0px";
 	}
 	_container.style.display = willShow ? "block" : "none";
 	// console.log("togglemkb", willShow);
@@ -262,28 +283,13 @@ function adjustContainer(dH) {
 	const newH = h0 - dH;
 	_container.style.height = newH + "px";
 }
-// let noResizeCount = 0,
-// 	prevDH = 0;
 function adjustToKeyboard() {
-	// const h1 = win.visualViewport.height;
-	// const dH = h0 - h1;
-	// const sameDiff = dH === prevDH;
-	// prevDH = dH;
-	// if (!sameDiff) {
-	// 	noResizeCount = 0;
-	// 	adjustContainer(dH);
-	// } else if (++noResizeCount == 4) {
-	// 	noResizeCount = 0;
-	// 	prevDH = 0;
-	// 	return;
-	// }
-	// return setTimeout(adjustToKeyboard, 75);
-
-	// wait for keyboard to finish opening
 	setTimeout(() => {
 		const dH = h0 - win.visualViewport.height;
 		if (dH) adjustContainer(dH);
+		keyboardHeight = dH || null;
 		scrollYWhenMKBOpened = window.scrollY;
+		lastScrollY = window.scrollY;
 	}, 750);
 }
 
@@ -297,8 +303,15 @@ function adjustToKeyboard() {
 		_container.style.display = "none";
 		bod.appendChild(_container);
 		listenGlobalEvents();
-		h0 = win.visualViewport.height;
-		console.log(h0);
+		let maxWrong = 0;
+		(function pollForHeight() {
+			const h1 = win.visualViewport.height;
+			console.log(h0, h1, h1 - h0, maxWrong);
+			const diff = h0 ? h1 - h0 : h1;
+			h0 = h1;
+			if (!diff) if (maxWrong++ == 2) return;
+			setTimeout(pollForHeight, 100);
+		})();
 		// setTimeout(toggleMKB, 333); // reveal on page load
 	});
 })();
