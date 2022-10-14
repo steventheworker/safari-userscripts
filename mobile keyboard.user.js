@@ -24,15 +24,15 @@ function addStyleSheet() {
 			 left: 0;
 			 width: 100%;
 			 height: 100vh;
-			 z-index: 2147483647;
+			 z-index: 2
+			 147483647;
 		 }
 		 .mkb-overlay {
 			 width: 100%;
 			 height: 100%;
-			 background: rgba(127.5, 127.5, 127.5, 0.3);
+			 background: rgba(127.5, 127.5, 127.5, 0.15);
 		 }
 		 .mkb-input {
-			font-size: 1.9rem;
 			width: 50%;
 			margin-left: 25%;
 			position: absolute;
@@ -64,15 +64,39 @@ function addStyleSheet() {
 			box-sizing: border-box;
 			border: none;
 			outline: 1px solid grey !important;
+			font-size: 0.5rem;
 		 }
-		 .mkb-modifiers button:last-child, .mkb-keyBtns button { /* shift key btn */
-			padding-left: 0.75em;
-			text-align: left;
+		 .mkb-modifiers button:first-child { /* shift key btn */
+		 	padding-left: 0em;text-align: left;
+		 }
+		 .mkb-keyBtns button {
+			text-align: center;
+			padding-left: 0em;
 		 }
 		 ._modSelected {background: darkgreen !important;}
 		 .mkb-keyBtns {
 			top: calc(25% - 1.9rem);
 		 }
+
+		 /* BREAKPOINTS */
+		/* iPhone se 2020 / iPhone 8 = @media (min-width: 375px) */
+		
+ 		@media (min-width: 414px)  { 		/* iPhone 8 Plus */
+			.mkb-modifiers button, .mkb-keyBtns button {
+				font-size: 0.84rem;
+			}
+			.mkb-modifiers button:first-child, .mkb-keyBtns button { /* shift key btn */
+				text-align: left;
+			}
+			.mkb-input {
+				font-size: 1.9rem;
+			}
+		}
+		@media (min-width: 768px)  {		/* ipad mini 7.9" */
+			.mkb-modifiers button:first-child, .mkb-keyBtns button { /* shift key btn */
+				padding-left: 0.75em;
+			}
+		}
    `,
 		head = doc.head || doc.getElementsByTagName("head")[0],
 		style = doc.createElement("style");
