@@ -144,7 +144,15 @@ function main() {
 	focusedElRef.focus(); //reset focus on input, if it was there before
 	//listen dom events
 	win.addEventListener("keydown", function (e) {
-		if ($isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) {
+			if (e.key === "Enter" && e.metaKey) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				const query = encodeURIComponent(e.target.value);
+				win.open(`${win.location.origin}/search?q=${query}`, "_blank");
+			}
+			return;
+		}
 		if (e.key === "Enter" && doc.activeElement.nodeName !== "A")
 			ray[i].querySelector("a").click(); //only virtually "click" link if not already focused on link
 		//prev & next arrow keys

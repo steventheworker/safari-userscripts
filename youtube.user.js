@@ -299,7 +299,7 @@ function ListenEvents() {
 			e.preventDefault();
 			e.stopImmediatePropagation();
 			const query = encodeURIComponent(e.target.value);
-			window.open(
+			win.open(
 				`https://www.youtube.com/results?search_query=${query}`,
 				"_blank"
 			);

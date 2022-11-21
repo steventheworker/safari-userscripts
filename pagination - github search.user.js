@@ -12,7 +12,7 @@
 (function () {
 	"use strict";
 	window.addEventListener("keydown", function (e) {
-		if (isInput(doc.activeElement)) return;
+		if ($isInput(doc.activeElement)) return;
 		if (e.key === "ArrowRight" && !e.metaKey)
 			document.querySelector(".next_page").click();
 		if (e.key === "ArrowLeft" && !e.metaKey)
