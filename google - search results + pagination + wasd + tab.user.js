@@ -55,12 +55,8 @@ function $els() {
 	const query = doc.querySelectorAll('div[role="navigation"] table td a');
 	return Array.prototype.slice.call(query);
 }
-function $prev() {
-	return $els()[0];
-}
-function $next() {
-	return $els()[$els().length - 1];
-}
+const $prev = () => $els()[0];
+const $next = () => $els()[$els().length - 1];
 
 //focus on results (a & d keys)
 let query, ray;
@@ -149,12 +145,15 @@ function addEventListeners() {
 			}
 			return;
 		}
-		if (e.key === "Enter" && doc.activeElement.nodeName !== "A")
-			ray[i].querySelector("a").click(); //only virtually "click" link if not already focused on link
-		//prev & next arrow keys
+
+		//pagination - prev & next arrow keys
 		if (e.key === "ArrowRight" && !e.metaKey) win.location = $next().href;
 		if (e.key === "ArrowLeft" && !e.metaKey) win.location = $prev().href;
-		//wasd
+
+		if (e.key === "Enter" && doc.activeElement.nodeName !== "A")
+			ray[i].querySelector("a").click(); //only virtually "click" link if not already focused on link
+
+		//wasd navigation
 		if (e.key === "a")
 			win.scroll({
 				left: 0,
@@ -189,9 +188,11 @@ function addEventListeners() {
 			if (e.shiftKey) prevResult(e);
 			else nextResult(e);
 		}
-		//Month Day Year Week (date sort)
+
+		//YMWDH sort - Month Day Year Week
 		const el_index_dict = { Y: 5, M: 4, W: 3, D: 2, H: 1 };
 		if (el_index_dict[e.key] !== undefined) {
+			if (isMobile) doc.querySelector('g-menu').querySelectorAll('g-menu-item')[el_index_dict[e.key]].querySelector('a').click(); //prettier-ignore
 			const toggleMenuBtn = doc.getElementsByClassName("KTBKoe")[0];
 			toggleMenuBtn.click();
 			setTimeout(() => {
@@ -203,11 +204,13 @@ function addEventListeners() {
 				].children[0].children[0].click();
 			});
 		}
+
 		//site searching (eg: site:example.com)
 		if (site_dict[e.key] && removeSiteFromQuery() !== site_dict[e.key]) {
 			add2query(" site:" + site_dict[e.key]);
 			searchBtn().click();
 		}
+
 		//google images, google videos, all google results (navigation button shortcuts)
 		if (e.key === "I" || e.key === "V" || e.key === "A") {
 			const items = Array.prototype.slice.call(
@@ -221,7 +224,8 @@ function addEventListeners() {
 				}
 			}
 		}
-		//open query on YouTube
+
+		//search query on YouTube
 		if (e.key === "y" && e.shiftKey && e.metaKey)
 			window.open(
 				"https://www.youtube.com/results?search_query=" +
