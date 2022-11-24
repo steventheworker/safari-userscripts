@@ -11,13 +11,29 @@
 
 //globals
 let isMobile = false;
+function addStylesheet() {
+	const style = doc.createElement("style");
+	style.innerHTML = `
+	form {position: relative;} /* first form = search container */
+.g:hover a {color: #AA6600 !important;}
+.g a {transition: color ease-in-out 333ms;}
+.focusedResult {outline: 1px dashed black;}
+.focusedResult a:visited {color: purple !important;}
+.focusedResult a:hover {color: inehrit !important;}
+`;
+	const node = doc.createElement("p");
+	bod.appendChild(node);
+	node.after(style);
+}
 
 //helper fns
-function removeOtherSitesFromQuery() {
+function removeSiteFromQuery() {
 	const el = doc.querySelector("input");
 	const val = el.value;
 	const ray = val.split("site:");
-	el.value = ray[0] + ((ray[1] || "").split(" ")[1] || "");
+	const querySite = (ray[1] || "").split(" ")[0] || "";
+	el.value = el.value.replace("site:" + querySite, "");
+	return querySite;
 }
 function add2query(txt) {
 	doc.querySelector("input").value += txt;
@@ -122,27 +138,7 @@ function findParentResult(tar) {
 	return tar;
 }
 
-function main() {
-	//mobile version initialization (searchBtn sets "isMobile")
-	searchBtn(); //add search btn if missing (missing on mobile)
-	//initialize page (style)
-	const style = doc.createElement("style");
-	style.innerHTML = `
-	form {position: relative;} /* first form = search container */
-.g:hover a {color: #AA6600 !important;}
-.g a {transition: color ease-in-out 333ms;}
-.focusedResult {outline: 1px dashed black;}
-.focusedResult a:visited {color: purple !important;}
-.focusedResult a:hover {color: inehrit !important;}
-`;
-	const node = doc.createElement("p");
-	bod.appendChild(node);
-	node.after(style);
-	//(focus result's)
-	const focusedElRef = doc.activeElement;
-	refocus();
-	focusedElRef.focus(); //reset focus on input, if it was there before
-	//listen dom events
+function addEventListeners() {
 	win.addEventListener("keydown", function (e) {
 		if ($isInput(doc.activeElement)) {
 			if (e.key === "Enter" && e.metaKey) {
@@ -208,8 +204,7 @@ function main() {
 			});
 		}
 		//site searching (eg: site:example.com)
-		if (site_dict[e.key]) {
-			removeOtherSitesFromQuery();
+		if (site_dict[e.key] && removeSiteFromQuery() !== site_dict[e.key]) {
 			add2query(" site:" + site_dict[e.key]);
 			searchBtn().click();
 		}
@@ -260,5 +255,14 @@ function main() {
 
 (function () {
 	"use strict";
-	setTimeout(main, 500);
+	setTimeout(() => {
+		//mobile version initialization (searchBtn sets "isMobile")
+		searchBtn(); //add search btn if missing (missing on mobile)
+		//init UI
+		//(focus result's)
+		const focusedCached = doc.activeElement;
+		refocus();
+		focusedCached.focus(); //reset focus on input, if it was there before
+		addEventListeners();
+	}, 500);
 })();
