@@ -123,7 +123,7 @@ function openThread(el, newTab) {
 		else {
 			//open Settings submenu
 			const carets = doc.getElementsByClassName("icon-caret_down");
-			const settingsCaret = carets[10];
+			const settingsCaret = carets[10] || carets[9];
 			if (
 				settingsCaret.parentNode.children[1] &&
 				settingsCaret.parentNode.children[1].textContent === "Settings"
