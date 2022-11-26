@@ -259,6 +259,7 @@ function addEventListeners() {
 
 (function () {
 	"use strict";
+	addStylesheet();
 	setTimeout(() => {
 		//mobile version initialization (searchBtn sets "isMobile")
 		searchBtn(); //add search btn if missing (missing on mobile)

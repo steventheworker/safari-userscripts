@@ -149,14 +149,16 @@ function openThread(el, newTab) {
 	waitForEl("#USER_DROPDOWN_ID").then((dropDown) => openDropDown(dropDown));
 	//Auto-Click "View Entire Discussion" - Spoiler button
 	const clickDiscussionSpoiler = () => {
-		if (isLoggedIn()) return;
-		const ray = Array.prototype.slice.call(
-			document.querySelectorAll('button[tabindex="0"]')
-		);
-		ray.forEach((curBtn, i) => {
-			if (curBtn.innerHTML.startsWith("View Entire Discussion"))
-				curBtn.click();
-		});
+		setTimeout(() => {
+			if (isLoggedIn()) return;
+			const ray = Array.prototype.slice.call(
+				document.querySelectorAll('button[tabindex="0"]')
+			);
+			ray.forEach((curBtn, i) => {
+				if (curBtn.innerHTML.startsWith("View Entire Discussion"))
+					curBtn.click();
+			});
+		}, 3000);
 	};
 	document.body.onload = clickDiscussionSpoiler;
 })();
