@@ -26,8 +26,12 @@ function openThread(el, newTab) {
 (function () {
 	//reddit thread shortcut.user.js
 	addGlobalStyle(`
-		"._1OVBBWLtHoSPfGCRaPzpTf._3nSp9cdBpqL13CqjdMr2L_ { width: 90% !important;}"
-		"div { max-width: none !important; }
+		 /* make content use more width */
+		._1OVBBWLtHoSPfGCRaPzpTf._3nSp9cdBpqL13CqjdMr2L_ { width: 90% !important;}
+		div { max-width: none !important; }
+
+		/* Join Reddit box */
+		.BtYn3oMRXzNwmNMkolecQ {display: none;}
 	`);
 	window.addEventListener("keydown", function (e) {
 		if ($isInput(doc.activeElement)) return;
