@@ -9,6 +9,14 @@
 // @match        https://www.reddit.com/*
 // ==/UserScript==
 
+let cache$isLoggedIn;
+const isLoggedIn = () =>
+	cache$isLoggedIn
+		? cache$isLoggedIn
+		: (cache$isLoggedIn = doc.getElementById(
+				"email-collection-tooltip-id"
+		  ));
+
 function openThread(el, newTab) {
 	if (!el) return;
 	if (el.nodeName !== "A")
@@ -18,25 +26,15 @@ function openThread(el, newTab) {
 			)[0],
 			newTab
 		);
-	// window.open(el.href, newTab ? "_blank" : undefined);
+	// win.open(el.href, newTab ? "_blank" : undefined);
 	el.focus();
 }
 
-//init
-(function () {
-	//reddit thread shortcut.user.js
-	addGlobalStyle(`
-		 /* make content use more width */
-		._1OVBBWLtHoSPfGCRaPzpTf._3nSp9cdBpqL13CqjdMr2L_ { width: 90% !important;}
-		div { max-width: none !important; }
-
-		/* Join Reddit box */
-		.BtYn3oMRXzNwmNMkolecQ {display: none;}
-	`);
-	window.addEventListener("keydown", function (e) {
+function addEventListeners() {
+	win.addEventListener("keydown", function (e) {
 		if ($isInput(doc.activeElement)) return;
 		//sort
-		const threadSortPicker = document.querySelector(
+		const threadSortPicker = doc.querySelector(
 			"button#CommentSort--SortPicker"
 		);
 		if (threadSortPicker) {
@@ -46,9 +44,12 @@ function openThread(el, newTab) {
 			if (selectIndex !== undefined) {
 				//open menu, then click menu-item
 				threadSortPicker.click();
-				Array.prototype.slice
-					.call(document.querySelectorAll('div[role="menu"] button'))
-					[selectIndex].click();
+				const container = Array.from(
+					doc.querySelectorAll('div[role="menu"]')
+				)
+					.filter((el, i) => el.parentNode.parentNode === bod)
+					.pop();
+				container.querySelectorAll("button")[selectIndex].click();
 			}
 		} else {
 			//subreddit mode
@@ -64,7 +65,7 @@ function openThread(el, newTab) {
 				T: "Top",
 				R: "Rising",
 			};
-			let links = document.getElementsByClassName(
+			let links = doc.getElementsByClassName(
 				"ListingLayout-outerContainer"
 			)[0].children[1];
 			links = links.children[links.children.length - 1].children[0];
@@ -94,6 +95,34 @@ function openThread(el, newTab) {
 			if (selectIndex !== null) links.children[selectIndex].click();
 		}
 	});
+	// let downState = { e: {}, scrollY: win.scrollY };
+	win.downState = {};
+	win.addEventListener("mousedown", function (e) {
+		if (e.target.textContent === "Continue this thread") {
+			downState = { e, scrollY: win.scrollY };
+		}
+	});
+	win.addEventListener("mouseup", function (e) {
+		if (
+			downState.e.target === e.target &&
+			e.target.textContent === "Continue this thread"
+		) {
+			setTimeout(() => win.scrollTo(win.scrollX, downState.scrollY), 167);
+		}
+	});
+}
+//init
+(function () {
+	//reddit thread shortcut.user.js
+	addGlobalStyle(`
+		 /* make content use more width */
+		._1OVBBWLtHoSPfGCRaPzpTf._3nSp9cdBpqL13CqjdMr2L_ { width: 90% !important;}
+		div { max-width: none !important; }
+
+		/* Join Reddit box */
+		.BtYn3oMRXzNwmNMkolecQ {display: none;}
+	`);
+	addEventListeners();
 
 	//reddit.user.js
 	addGlobalStyle(`
@@ -149,40 +178,35 @@ function openThread(el, newTab) {
 	waitForEl("#USER_DROPDOWN_ID").then((dropDown) => openDropDown(dropDown));
 	//Auto-Click "View Entire Discussion" - Spoiler button
 	const clickDiscussionSpoiler = () => {
-		setTimeout(() => {
-			if (isLoggedIn()) return;
-			const ray = Array.prototype.slice.call(
-				document.querySelectorAll('button[tabindex="0"]')
-			);
-			ray.forEach((curBtn, i) => {
-				if (curBtn.innerHTML.startsWith("View Entire Discussion"))
-					curBtn.click();
-			});
-		}, 3000);
+		if (isLoggedIn()) return;
+		const ray = Array.prototype.slice.call(
+			doc.querySelectorAll('button[tabindex="0"]')
+		);
+		ray.forEach((curBtn, i) => {
+			if (curBtn.innerHTML.startsWith("View Entire Discussion"))
+				curBtn.click();
+		});
+		if (!ray.length) setTimeout(clickDiscussionSpoiler, 1500);
 	};
-	document.body.onload = clickDiscussionSpoiler;
+
+	onPageLoaded(() => {
+		clickDiscussionSpoiler();
+	});
 })();
 
-let cache$isLoggedIn;
-const isLoggedIn = () =>
-	cache$isLoggedIn
-		? cache$isLoggedIn
-		: (cache$isLoggedIn = doc.getElementById(
-				"email-collection-tooltip-id"
-		  ));
 // wait for element to exist
 // https://stackoverflow.com/a/61511955
 function waitForEl(selector) {
 	return new Promise((resolve) => {
-		if (document.querySelector(selector))
-			return resolve(document.querySelector(selector));
+		if (doc.querySelector(selector))
+			return resolve(doc.querySelector(selector));
 		const observer = new MutationObserver((mutations) => {
-			if (document.querySelector(selector)) {
-				resolve(document.querySelector(selector));
+			if (doc.querySelector(selector)) {
+				resolve(doc.querySelector(selector));
 				observer.disconnect();
 			}
 		});
-		observer.observe(document.body, {
+		observer.observe(bod, {
 			childList: true,
 			subtree: true,
 		});
@@ -193,11 +217,11 @@ function waitForEl(selector) {
 function addGlobalStyle(css) {
 	//https://greasyfork.org/en/scripts/405073-wide-new-reddit-userscript
 	var head, style;
-	head = document.getElementsByTagName("head")[0];
+	head = doc.getElementsByTagName("head")[0];
 	if (!head) {
 		return;
 	}
-	style = document.createElement("style");
+	style = doc.createElement("style");
 	style.type = "text/css";
 	style.innerHTML = css;
 	head.appendChild(style);
