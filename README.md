@@ -51,7 +51,8 @@ Instagram
 
 YouTube
 
--   **cmd+k**: Mark live chat as read and right click
+-   floating live chat - drag & drop corners/topbar to resize/move
+-   **cmd+k**: Mark live chat as read and (popup button on right click)
 -   **cmd+enter (on YouTube search input)**: open query in new tab
 -   [] = increase/decrease playback rate
 -   Increase commenter profile picture size
