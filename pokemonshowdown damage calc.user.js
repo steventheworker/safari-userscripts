@@ -79,6 +79,22 @@ function focus2() {
 	});
 	//listen events
 	$(window)
+		.on("keydown", function (e) {
+			//refresh
+			if (e.originalEvent.code === "KeyR" && e.altKey)
+				window.location = window.location;
+
+			if (e.key === "-" || e.key === "=") {
+				if ($(".select2-drop-mask").css("display") === "block") {
+					//blur select
+					$("#select2-drop").last().hide();
+					$(".select2-drop-mask").hide();
+				} else {
+					if (e.key === "-") focus1();
+					if (e.key === "=") focus2();
+				}
+			}
+		})
 		.on("keyup", function (e) {
 			if (
 				document.activeElement.nodeName === "INPUT" ||
@@ -87,8 +103,6 @@ function focus2() {
 				return;
 			if (e.key === "Escape" || e.key === "c")
 				window.parent.postMessage({ type: "exit" }, "*");
-			if (e.key === "-") focus1();
-			if (e.key === "=") focus2();
 		})
 		.on("resize", resize);
 	$("body")
