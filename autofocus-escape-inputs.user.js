@@ -38,7 +38,6 @@
 				.filter((el, i) => !el.disabled); //no disabled elements
 			/* //used when a website uses the first input element as the search box */
 			const inputIndexDict = {
-				//first result (in the "ray" query)
 				"www.amazon.com": 0,
 				"www.bing.com": 0,
 				"www.google.com": 0,
@@ -55,6 +54,7 @@
 				//second result
 				"www.aliexpress.com": 1,
 				"www.walmart.com": 1,
+				"www.twitch.tv": 0,
 			};
 			if (loc === "www.netflix.com")
 				doc.getElementsByClassName("search-icon")[0].parentNode.click(); //input is hidden until icon clicked
