@@ -28,7 +28,7 @@ function addStylesheet() {
 
 //helper fns
 function removeSiteFromQuery() {
-	const el = doc.querySelector("input");
+	const el = searchInput();
 	const val = el.value;
 	const ray = val.split("site:");
 	const querySite = (ray[1] || "").split(" ")[0] || "";
@@ -36,8 +36,9 @@ function removeSiteFromQuery() {
 	return querySite;
 }
 function add2query(txt) {
-	doc.querySelector("input").value += txt;
+	searchInput().value += txt;
 }
+const searchInput = () => doc.querySelector("textarea");
 const searchBtn = () => {
 	const el = doc.querySelector("button[type='submit']");
 	if (!el || el.disabled) {
@@ -229,9 +230,10 @@ function addEventListeners() {
 		if (e.key === "y" && e.shiftKey && e.metaKey)
 			window.open(
 				"https://www.youtube.com/results?search_query=" +
-					encodeURIComponent(
-						doc.querySelector("input").value
-					).replace(/%20/g, "+"),
+					encodeURIComponent(searchInput().value).replace(
+						/%20/g,
+						"+"
+					),
 				"_blank"
 			);
 	});
