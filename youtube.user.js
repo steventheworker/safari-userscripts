@@ -206,6 +206,8 @@ function ListenEvents() {
 		function (e) {
 			if ($isInput(doc.activeElement)) return;
 
+			//autofocus (it's starting to get iffy, it only seems to work ("/") on the homepage, otherwise does nothing)
+			if (e.key === "/") doc.querySelector("input#search").focus();
 			//remap keys WASD IJKL
 			if (e.key === "w" || e.key === "i") {
 				win.scroll({

@@ -38,7 +38,7 @@ function removeSiteFromQuery() {
 function add2query(txt) {
 	searchInput().value += txt;
 }
-const searchInput = () => doc.querySelector("textarea");
+const searchInput = () => doc.querySelector(isMobile ? "input" : "textarea");
 const searchBtn = () => {
 	const el = doc.querySelector("button[type='submit']");
 	if (!el || el.disabled) {

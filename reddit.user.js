@@ -65,34 +65,52 @@ function addEventListeners() {
 				T: "Top",
 				R: "Rising",
 			};
+			if (!sortRedditdMap[e.key]) return;
 			let links = doc.getElementsByClassName(
 				"ListingLayout-outerContainer"
-			)[0].children[1];
-			links = links.children[links.children.length - 1].children[0];
+			);
+			if (links[0]) {
+				links = links[0].children[1];
+				links = links.children[links.children.length - 1].children[0];
 
-			if (
-				links.children[0].children.length > 3 &&
-				!links.children[0].children[0]
-					.getAttribute("href")
-					?.startsWith("/user/")
-				// &&
-				// !win.location.pathname.startsWith("/r/news")
-			)
-				links = links.children[0].children[1];
-			else links = links.children[1].children[1];
+				if (
+					links.children[0].children.length > 3 &&
+					!links.children[0].children[0]
+						.getAttribute("href")
+						?.startsWith("/user/")
+					// &&
+					// !win.location.pathname.startsWith("/r/news")
+				)
+					links = links.children[0].children[1];
+				else links = links.children[1].children[1];
 
-			const linkLabel = sortRedditdMap[e.key];
-			const selectIndex = linkLabel
-				? (function getSelectIndex() {
-						let ret;
-						Array.from(links.children).forEach((el, i) => {
-							if (el.href.endsWith(linkLabel.toLowerCase() + "/"))
-								ret = i;
-						});
-						return ret;
-				  })()
-				: null;
-			if (selectIndex !== null) links.children[selectIndex].click();
+				const linkLabel = sortRedditdMap[e.key];
+				const selectIndex = linkLabel
+					? (function getSelectIndex() {
+							let ret;
+							Array.from(links.children).forEach((el, i) => {
+								if (
+									el.href.endsWith(
+										linkLabel.toLowerCase() + "/"
+									)
+								)
+									ret = i;
+							});
+							return ret;
+					  })()
+					: null;
+				if (selectIndex !== null) links.children[selectIndex].click();
+			} else {
+				let path = win.location.pathname.split("/"); // /r/aldi/comments/10q5yqc/is_this_the_red_bag_chicken_everyone_raves_about/
+				if (path[3] == "comments") {
+					const url = new URL(window.location.href);
+					url.searchParams.set(
+						"sort",
+						sortRedditdMap[e.key].toLowerCase()
+					);
+					window.location.href = url.toString();
+				}
+			}
 		}
 	});
 	// let downState = { e: {}, scrollY: win.scrollY };
@@ -104,6 +122,7 @@ function addEventListeners() {
 	});
 	win.addEventListener("mouseup", function (e) {
 		if (
+			downState &&
 			downState.e.target === e.target &&
 			e.target.textContent === "Continue this thread"
 		) {
