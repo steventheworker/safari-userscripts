@@ -163,25 +163,14 @@ function transformShortsLink(tar) {
 	if (!href.startsWith("/shorts/")) return;
 	tar.setAttribute("href", "/watch?v=" + href.slice(8));
 }
-function shortsTraversal(tar) {
-	if (tar.id === "content") return; //reached a dead-end
-	const videoComponentEls = [
-		"YTD-COMPACT-VIDEO-RENDERER",
-		"YTD-VIDEO-RENDERER",
-		"YTD-GRID-VIDEO-RENDERER",
-		"YTD-REEL-ITEM-RENDERER",
-	];
-	if (videoComponentEls.indexOf(tar.nodeName) === -1)
-		return shortsTraversal(tar.parentNode); // traverse until reach a videoComponent
-	// found a videoComponent! ==> transform all links
-	Array.from(tar.querySelectorAll("a")).forEach((el) =>
-		transformShortsLink(el)
-	);
-}
 //events
 function ListenEvents() {
 	//youtube shorts links -> regular link (/shorts/vID => /watch?v=vID)
-	win.addEventListener("mousedown", (e) => shortsTraversal(e.target));
+	win.addEventListener("mousedown", (e) => {
+		Array.from(doc.elementsFromPoint(e.pageX, e.pageY)).filter((el) => {
+			if (el.nodeName === "A") transformShortsLink(el);
+		});
+	});
 	win.addEventListener("mouseup", (e) => {
 		setTimeout(() => {
 			//check if clicked a shorts link & redirect
