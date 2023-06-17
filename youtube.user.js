@@ -65,6 +65,7 @@ function videoFixed(sticky = true) {
 		return el;
 	}
 	const theaterContainer = doc.getElementById("player-theater-container");
+	if (!theaterContainer) return;
 	const player = theaterContainer.innerHTML
 		? theaterContainer
 		: doc.getElementById("player");
