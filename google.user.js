@@ -5,8 +5,9 @@
 // @description  remove chrome ad, (shift+I => Images (hotkey))
 // @author       steventheworker
 // @icon         https://upload.wikimedia.org/wikipedia/commons/2/2d/Google-favicon-2015.png
-// @include      /^http(s|):\/\/(www\.|)google\.(com|net|de|ru|co\.uk).*$/
+// @include      /^http(s|):\/\/(www\.|)google\.(com|net|de|ru|co\.uk).$/
 // @grant        none
+// @run-at       document-idle
 // ==/UserScript==
 
 const remove_chrome_ad = () =>
