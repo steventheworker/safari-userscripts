@@ -74,7 +74,7 @@ function getScrollParent(node) {
 					initScrollX === window.scrollX &&
 					initScrollY === window.scrollY;
 				if (scrollCounter === 3 && SameScrollXY) el = tentativeElement; //if no scroll changes within x intervals, scroll tentativeElement instead
-				if (el || redditMode)
+				if (el || tentativeElement === redditMode)
 					startClick = {
 						x: e.pageX,
 						y: e.pageY,
