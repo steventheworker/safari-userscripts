@@ -19,6 +19,7 @@ let cur = {};
 let scrollCounter = 0; //every time interval runs +1, resets on mouseup
 let initScrollX; //start scrollX, initialized on mousedown
 let initScrollY; //start scrollY, initialized on mousedown
+let redditMode = 0; // 0 = not reddit.com, 1 = reddit.com (but not a thread), 2 = reddit thread, 3 = reddit thread (overlayed (affects scrolling))
 
 function isScrollable(node) {
 	const style = getComputedStyle(node);
@@ -30,13 +31,31 @@ function isScrollable(node) {
 		: false;
 }
 function getScrollParent(node) {
+	if (redditMode && redditMode !== 1 && redditMode !== 2) return redditMode;
 	if (!node || node === document) return null;
 	if (isScrollable(node)) return node;
 	else return getScrollParent(node.parentNode);
 }
 
 (function () {
-	"use strict";
+	("use strict");
+
+	// Check if the URL matches a Reddit thread pattern (overlay scroll fix)
+	if (window.location.host.includes("reddit.com")) {
+		const handleRedditURLChange = () => {
+			if (window.location.href.includes("/comments/")) {
+				const overlayScrollEl = document.getElementById(
+					"overlayScrollContainer"
+				);
+				redditMode = document.getElementById("overlayScrollContainer") || 2; // prettier-ignore
+			} else redditMode = 1;
+		};
+		window.addEventListener("mouseup", () => {
+			setTimeout(handleRedditURLChange, 500);
+		});
+		handleRedditURLChange();
+	}
+
 	window.addEventListener("mousedown", function (e) {
 		const isMiddle = e.button === 1;
 		if (isMiddle) {
@@ -55,10 +74,17 @@ function getScrollParent(node) {
 					initScrollX === window.scrollX &&
 					initScrollY === window.scrollY;
 				if (scrollCounter === 3 && SameScrollXY) el = tentativeElement; //if no scroll changes within x intervals, scroll tentativeElement instead
+				if (el || redditMode)
+					startClick = {
+						x: e.pageX,
+						y: e.pageY,
+					};
+
 				const dx = cur.x - startClick.x;
 				const dy = cur.y - startClick.y;
 				scrollCounter++;
-				if (el) return el.scrollBy(dx, dy);
+				if (el || tentativeElement === redditMode)
+					return el.scrollBy(dx, dy);
 				window.scroll(dx, dy);
 			}, millisecs);
 			addVisual(startClick.x, startClick.y);
