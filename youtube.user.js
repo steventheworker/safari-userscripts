@@ -64,7 +64,7 @@ function videoFixed(sticky = true) {
 		el.style.width = player.clientWidth + "px";
 		return el;
 	}
-	const theaterContainer = doc.getElementById("player-theater-container");
+	const theaterContainer = doc.getElementById("player-wide-container");
 	if (!theaterContainer) return;
 	const player = theaterContainer.innerHTML
 		? theaterContainer
@@ -380,7 +380,7 @@ function addStyleSheet() {
 	 .darkSearchResults ul li:last-child div {background: black!important;} /* report search item */
 
 	 /* theater mode (not fullscreen) full height */
-	 ytd-watch-flexy[theater-requested_]:not([fullscreen]) #player-theater-container {
+	 ytd-watch-flexy[theater-requested_]:not([fullscreen]) #player-wide-container {
 		 height:calc(100vh - 56px) !important; max-height:calc(100vh - 56px) !important;min-height:calc(100vh - 56px) !important;
 	 }
 
