@@ -193,17 +193,13 @@ function addEventListeners() {
 		//YMWDH sort - Month Day Year Week
 		const el_index_dict = { Y: 5, M: 4, W: 3, D: 2, H: 1 };
 		if (el_index_dict[e.key] !== undefined) {
-			if (isMobile) doc.querySelector('g-menu').querySelectorAll('g-menu-item')[el_index_dict[e.key]].querySelector('a').click(); //prettier-ignore
-			const toggleMenuBtn = doc.getElementsByClassName("KTBKoe")[0];
-			toggleMenuBtn.click();
-			setTimeout(() => {
-				const toggleMenu =
-					doc.getElementById("before-appbar").nextSibling.children[0]
-						.children[0];
-				toggleMenu.children[
-					el_index_dict[e.key]
-				].children[0].children[0].click();
-			});
+			if (isMobile) {
+				return doc.querySelector('g-menu').querySelectorAll('g-menu-item')[el_index_dict[e.key]].querySelector('a').click(); //prettier-ignore
+			}
+			let toggleMenu = doc.querySelectorAll("#top_nav g-menu")[0];
+			toggleMenu.children[el_index_dict[e.key]]
+				.querySelector("a")
+				.click();
 		}
 
 		//site searching (eg: site:example.com)
