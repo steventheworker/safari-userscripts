@@ -24,7 +24,7 @@ function handleKeys() {
 		if (k === "s" || k === "k") scrollY += 300; //pgdn
 		if (k === "d" || k === "l") nextPhoto(); //next photo (multiple photos) (topmost visible post)
 	}
-	window.scroll({ left: 0, top: scrollY, behavior: "smooth" });
+	window.scroll({ left: 0, top: scrollY, behavior: "auto" });
 }
 
 let runningPg;
