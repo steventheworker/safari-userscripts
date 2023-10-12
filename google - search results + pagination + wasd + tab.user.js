@@ -38,7 +38,7 @@ function removeSiteFromQuery() {
 function add2query(txt) {
 	searchInput().value += txt;
 }
-const searchInput = () => doc.querySelector(isMobile ? "input" : "textarea");
+const searchInput = () => doc.querySelector("textarea");
 const searchBtn = () => {
 	const el = doc.querySelector("button[type='submit']");
 	if (!el || el.disabled) {
@@ -74,7 +74,7 @@ function setFocus(tar) {
 		top: pos.top + win.scrollY - searchHeight * 2.5,
 		behavior: "smooth",
 	});
-	tar.querySelector("a").focus();
+	tar.querySelector("a")?.focus();
 }
 function prevResult(e) {
 	if (e) e.preventDefault();
