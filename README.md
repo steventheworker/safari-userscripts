@@ -1,12 +1,26 @@
 steven's userscripts &nbsp; &nbsp; &nbsp; &nbsp; -- targeting macOS Firefox and Safari (iOS too), but works on all platforms
 
-### <u>Setup</u>
+start the hot reload server: ```pnpm dev``` and ```pnpm  build``` ouptut ```Userscripts/<subfolder>.user.js```
+for ```src/<subfolder>/index.ts``` 
 
-[<u>**Userscripts extension**</u>](https://itunes.apple.com/us/app/userscripts/id1463298887) (recommended): &nbsp; no setup required & works on iOS!
+```src/_js``` holds raw .user.js files
 
-or using <u>**Tampermonkey**</u>: &nbsp; step 1, open config.user.js in the built-in editor and open the settings tab. Set the position to 1, and "run at" to document-start.
+### <u>Install</u>
+1. [<u>**quoid/Userscripts extension**</u>](https://itunes.apple.com/us/app/userscripts/id1463298887)
 
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; step 2 (<u>**OPTIONAL) + (Firefox ONLY**</u>): &nbsp; host this folder as http://localhost/userscripts (port 80) with any web server and import tampermonkey-export.zip (allows you to use "git pull" to live patch updates from this GitHub; edit these userscripts from your filesystem / favorite editor)
+1. or using <u>**Violentmonkey**</u>: &nbsp; step 1, open globals.user.js in the built-in editor and open the settings tab. Set the position to 1, and "run at" to document-start.
+
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; step 2 <u>**OPTIONAL</u> + (Firefox ONLY**): &nbsp; host safari-userscripts/Userscripts  as http://localhost/userscripts (port 80) with any web server
+
+install: ```pnpm install``` (don't forget to approve builds if asked) ```pnpm run build```
+
+Assuming you cloned this repo to the root of iCloud (and have 'Keep Downloaded' checked):
+
+```
+ln -s '/Users/<your_user>/Library/Mobile Documents/com~apple~CloudDocs/safari-userscripts/Userscripts' /opt/homebrew/var/www
+```
+
+adds a  symbolic link to the default path used by web servers like nginx (when installed via brew)
 
 &nbsp;
 
@@ -68,3 +82,9 @@ TikTok
 
 -   (mobile) make it usable while logged out
 -   export your likes using yt-dlp enter “javascript:dl()” in address bar once you’ve scrolled to the bottom
+
+&nbsp;
+
+```pnpm dev ``` starts hot reload server.
+
+```pnpm run update ``` (git pull && pnpm build)

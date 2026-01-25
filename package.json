@@ -11,8 +11,8 @@
     "release": "python3 scripts/release.py"
   },
   "devDependencies": {
-    "typescript": "^5.5.3",
-    "esbuild": "^0.27.2"
+    "esbuild": "^0.27.2",
+    "typescript": "^5.9.3"
   },
   "private": true
 }
