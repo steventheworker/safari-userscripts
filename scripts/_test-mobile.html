@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+		/>
+		<title>Test Mobile</title>
+		<style>
+			* {
+			}
+			html,
+			body {
+				color: white;
+				padding: 0;
+				margin: 0;
+				width: 100%;
+				height: 100%;
+			}
+			body {
+				background: darkblue;
+			}
+			.overlay {
+				background: rgba(0, 255, 0, 0.4);
+				width: 100%;
+				/* height: calc(100vh);
+				height: -webkit-fill-available; */
+				height: 315.5px;
+				position: absolute;
+				pointer-events: none;
+			}
+		</style>
+	</head>
+	<body onload="dependenciesLoaded();">
+		<div class="overlay"></div>
+		<input type="text" onfocus="setTimeout(render, 750);" />
+		<script>
+			const dependenciesLoaded = () => !window.win ? setTimeout(dependenciesLoaded, 100) : init(); // prettier-ignore
+			function render() {
+				bod.appendChild(
+					doc.createTextNode(`(${win.visualViewport.height}`)
+				);
+				bod.appendChild(doc.createTextNode(`, ${win.innerHeight})`));
+			}
+			function init() {
+				// setTimeout(() => triggerKeyDown("k", { cmd: true, opt: true, ctrl: true }), 333); // prettier-ignore
+				win.addEventListener("keydown", (e) => {
+					console.log(e);
+				});
+				win.addEventListener("keyup", (e) => {
+					console.log(e);
+				});
+				onPageLoaded(render);
+			}
+		</script>
+	</body>
+</html>

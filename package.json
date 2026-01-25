@@ -1,0 +1,18 @@
+{
+  "name": "safari-userscripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "mkdir -p Userscripts && pnpm clearUserscripts && node scripts/dev.mjs & tsc --noEmit --watch",
+    "build": "mkdir -p Userscripts && pnpm clearUserscripts && node scripts/dev.mjs --once && tsc --noEmit",
+    "clearUserscripts": "find ./Userscripts -type f -name \"*.user.js\" -exec rm {} +",
+    "update": "git pull && pnpm build",
+    "release": "python3 scripts/release.py"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "esbuild": "^0.27.2"
+  },
+  "private": true
+}
