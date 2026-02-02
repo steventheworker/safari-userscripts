@@ -101,40 +101,38 @@ function watchUserJS(dir, isPrivate = false) {
 
 
 /*
+    tryPath
+ */
+async function tryPath(dir, entry) {
+    if (entry === ".git" || entry === "node_modules") return;
+    const full = path.join(dir, entry);
+    if (!fs.statSync(full).isDirectory()) return;
+    if (!fs.existsSync(path.join(full, "index.ts"))) {// recurse organizational folders
+        for (const _entry of fs.readdirSync(full)) tryPath(full, _entry);
+        return;
+    }
+    await buildOne(full);
+}
+
+
+/*
     main
 */
 async function main() {
     fs.mkdirSync(OUT, { recursive: true });
-
     for (const entry of fs.readdirSync(SRC)) {
+        tryPath(SRC, entry);
+        // watch raw .user.js (_js) folders
         const full = path.join(SRC, entry);
-        if (!fs.statSync(full).isDirectory()) continue;
-
-        // PRIVATE
-        if (entry === "_private") {
-            for (const sub of fs.readdirSync(full)) {
-                const subdir = path.join(full, sub);
-                if (!fs.statSync(subdir).isDirectory()) continue;
-
-                if (sub === "_js") {
+        if (entry === "_private") { // PRIVATE
+            for (const item of fs.readdirSync(full)) {
+                const subdir = path.join(full, item);
+                if (fs.statSync(subdir).isDirectory() && item === "_js")
                     watchUserJS(subdir, true);
-                } else {
-                    await buildOne(subdir, true);
-                }
             }
-            continue;
-        }
+        } else if (entry === "_js") watchUserJS(full, false); // PUBLIC RAW JS
 
-        // PUBLIC RAW JS
-        if (entry === "_js") {
-            watchUserJS(full, false);
-            continue;
-        }
-
-        // PUBLIC TS
-        await buildOne(full);
     }
-
     if (!ONCE) console.log("👀 watching…");
     else process.exit(0);
 }
