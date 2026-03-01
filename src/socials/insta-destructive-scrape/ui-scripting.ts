@@ -24,8 +24,7 @@ export const articleWithPostAnchor: (postAnchor: HTMLElement) => HTMLElement = (
 export const getPopup = () => doc.querySelector('article[role="presentation"]');
 
 export const getPopupPostItemDots = () => {
-	let container = getPopup()?.children[0].children[0].children[0];
-	container = container?.children[container.children.length - 1]; //the last one here is the container of the individual dots
+	let container = getPopup()?.children[0]?.children[0]?.children[0]?.children[0]?.children[1];
 	return (container && Array.from(container.children)) || [document.body]; // add dummy (document.body) since post ≥ 1 item
 };
 
