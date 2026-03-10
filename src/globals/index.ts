@@ -11,8 +11,6 @@
 // @run-at       document-start
 // ==/UserScript==
 
-"use strict";
-
 (function () {
   const DefaultConfig = {
     ControlPanel: {
