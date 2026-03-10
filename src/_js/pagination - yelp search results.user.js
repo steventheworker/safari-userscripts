@@ -11,7 +11,7 @@
 
 function $els() {
 	const query = document.querySelectorAll(
-		'div[aria-label="Pagination navigation"] div div div a'
+		'div[aria-label="Pagination navigation"] div div div a',
 	);
 	return Array.prototype.slice.call(query);
 }

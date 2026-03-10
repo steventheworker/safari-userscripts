@@ -34,7 +34,7 @@ function EventListeners() {
 const clickSortBtn = () => {
 	document
 		.querySelector(
-			'section[aria-label="Recommended Reviews"] button[type="button"]'
+			'section[aria-label="Recommended Reviews"] button[type="button"]',
 		)
 		.click();
 };
@@ -47,7 +47,7 @@ const sortBy = (i) => {
 	//click menu item w/ index i
 	document
 		.querySelectorAll(
-			'section[aria-label="Recommended Reviews"] menu button'
+			'section[aria-label="Recommended Reviews"] menu button',
 		)
 		[i].click();
 };

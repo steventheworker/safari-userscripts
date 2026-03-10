@@ -9,25 +9,25 @@
 // ==/UserScript==
 
 const jsConsentBannerMatches = {
-  // @match        https://apple.stackexchange.com/*
-  // @match        https://unix.stackexchange.com/*
-  // @match        https://askubuntu.com/*
-  // @match        https://stackoverflow.com/*
-  // @match        https://superuser.com/*
-  // @match        https://vi.stackexchange.com
-  //https://vi.stackexchange.com
+	// @match        https://apple.stackexchange.com/*
+	// @match        https://unix.stackexchange.com/*
+	// @match        https://askubuntu.com/*
+	// @match        https://stackoverflow.com/*
+	// @match        https://superuser.com/*
+	// @match        https://vi.stackexchange.com
+	//https://vi.stackexchange.com
 };
 
 (function () {
-  "use strict";
+	"use strict";
 
-  // remove accept cookies popup
-  function main() {
-    doc.getElementById("onetrust-consent-sdk")?.remove();
-    doc.getElementsByClassName("js-consent-banner")[0]?.remove();
-  }
-  main();
-  onPageLoaded(() => {
-    setTimeout(main, 333);
-  });
+	// remove accept cookies popup
+	function main() {
+		doc.getElementById("onetrust-consent-sdk")?.remove();
+		doc.getElementsByClassName("js-consent-banner")[0]?.remove();
+	}
+	main();
+	onPageLoaded(() => {
+		setTimeout(main, 333);
+	});
 })();

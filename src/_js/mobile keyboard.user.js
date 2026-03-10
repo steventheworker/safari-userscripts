@@ -181,7 +181,7 @@ function addMKBListeners(el) {
 			(mods.cmd || mods.opt || mods.ctrl) && !isNamedKey
 				? e.key.toLowerCase()
 				: (mods.shift && !isNamedKey && e.key.toUpperCase()) || e.key,
-			mods
+			mods,
 		);
 		//refocus MKB,  but don't let MKB steal the focus ("/" used to focus an input (AutoScroll.user.js))
 		if (!(e.key === "/" && !mods.shift && !mods.ctrl && !mods.opt && !mods.cmd)) toggleMKB(); // prettier-ignore

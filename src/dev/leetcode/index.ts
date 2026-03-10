@@ -10,29 +10,31 @@
 // ==/UserScript==
 
 const pageType = {
-  problem: {
-    onKeyDown: (e: KeyboardEvent) => {
-      if (!location.pathname.startsWith("/problems")) return;
-      // CMD + R to run
-      console.log(e.key, e.metaKey);
-      if (e.key === "r" && e.metaKey) {
-        e.preventDefault(); // prevent refresh
-        const runBtn = document.querySelector('button[aria-label="Run"]');
-        (runBtn as HTMLButtonElement)?.click();
-      }
-    },
-  },
+	problem: {
+		onKeyDown: (e: KeyboardEvent) => {
+			if (!location.pathname.startsWith("/problems")) return;
+			// CMD + R to run
+			console.log(e.key, e.metaKey);
+			if (e.key === "r" && e.metaKey) {
+				e.preventDefault(); // prevent refresh
+				const runBtn = document.querySelector(
+					'button[aria-label="Run"]',
+				);
+				(runBtn as HTMLButtonElement)?.click();
+			}
+		},
+	},
 };
 
 function onKeyDown(e: KeyboardEvent) {
-  pageType.problem.onKeyDown(e);
+	pageType.problem.onKeyDown(e);
 }
 
 function addEventListeners() {
-  document.addEventListener("keydown", onKeyDown);
+	document.addEventListener("keydown", onKeyDown);
 }
 
 (function () {
-  console.log(`leetcode userscript started`);
-  addEventListeners();
+	console.log(`leetcode userscript started`);
+	addEventListeners();
 })();

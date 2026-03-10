@@ -52,7 +52,7 @@ let mouseDown;
 //}
 function markAsRead() {
 	const $logs = doc.querySelector(
-		"yt-live-chat-item-list-renderer #items"
+		"yt-live-chat-item-list-renderer #items",
 	).children;
 	for (let i = 0; i < $logs.length; i++) {
 		$logs[i].style.opacity = 0.2;
@@ -97,7 +97,7 @@ function addListeners(btn) {
 	const RSX = 10; //how far into a container resizing is enabled
 	win.addEventListener("mousemove", function (e) {
 		const liveChat = window.top.document.querySelector(
-			"ytd-live-chat-frame"
+			"ytd-live-chat-frame",
 		);
 		cursorResizeOrientation = "";
 		const rect = liveChat.getBoundingClientRect();
@@ -129,7 +129,7 @@ function addListeners(btn) {
 		if (cursorResizeOrientation)
 			addStyleSheet(
 				`* {cursor: ${cursorResizeOrientation}-resize !important;}`,
-				"globalCursor"
+				"globalCursor",
 			);
 		const cachedCursorResizeOrientation =
 			mouseDown?.cursorResizeOrientation;
@@ -155,7 +155,7 @@ function addListeners(btn) {
 				liveChat.style.setProperty.apply(liveChat.style, setArgs);
 				liveChat.children[0].style.setProperty.apply(
 					liveChat.children[0].style,
-					setArgs
+					setArgs,
 				);
 			}
 			if (
@@ -178,7 +178,7 @@ function addListeners(btn) {
 				liveChat.style.setProperty.apply(liveChat.style, setArgs);
 				liveChat.children[0].style.setProperty.apply(
 					liveChat.children[0].style,
-					setArgs
+					setArgs,
 				);
 			}
 		}

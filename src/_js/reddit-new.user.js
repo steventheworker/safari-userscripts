@@ -14,17 +14,17 @@ const isLoggedIn = () =>
 	cache$isLoggedIn
 		? cache$isLoggedIn
 		: (cache$isLoggedIn = doc.getElementById(
-				"email-collection-tooltip-id"
-		  ));
+				"email-collection-tooltip-id",
+			));
 
 function openThread(el, newTab) {
 	if (!el) return;
 	if (el.nodeName !== "A")
 		return openThread(
 			Array.from(el.querySelectorAll("a")).filter(
-				(el, i) => el.children[0]?.children[0]?.nodeName === "H3"
+				(el, i) => el.children[0]?.children[0]?.nodeName === "H3",
 			)[0],
-			newTab
+			newTab,
 		);
 	// win.open(el.href, newTab ? "_blank" : undefined);
 	el.focus();
@@ -35,7 +35,7 @@ function addEventListeners() {
 		if ($isInput(doc.activeElement)) return;
 		//sort
 		const threadSortPicker = doc.querySelector(
-			"button#CommentSort--SortPicker"
+			"button#CommentSort--SortPicker",
 		);
 		if (threadSortPicker) {
 			// thread / comment mode
@@ -45,7 +45,7 @@ function addEventListeners() {
 				//open menu, then click menu-item
 				threadSortPicker.click();
 				const container = Array.from(
-					doc.querySelectorAll('div[role="menu"]')
+					doc.querySelectorAll('div[role="menu"]'),
 				)
 					.filter((el, i) => el.parentNode.parentNode === bod)
 					.pop();
@@ -67,7 +67,7 @@ function addEventListeners() {
 			};
 			if (!sortRedditdMap[e.key]) return;
 			let links = doc.getElementsByClassName(
-				"ListingLayout-outerContainer"
+				"ListingLayout-outerContainer",
 			);
 			if (links[0]) {
 				links = links[0].children[1];
@@ -91,13 +91,13 @@ function addEventListeners() {
 							Array.from(links.children).forEach((el, i) => {
 								if (
 									el.href.endsWith(
-										linkLabel.toLowerCase() + "/"
+										linkLabel.toLowerCase() + "/",
 									)
 								)
 									ret = i;
 							});
 							return ret;
-					  })()
+						})()
 					: null;
 				if (selectIndex !== null) links.children[selectIndex].click();
 			} else {
@@ -106,7 +106,7 @@ function addEventListeners() {
 					const url = new URL(window.location.href);
 					url.searchParams.set(
 						"sort",
-						sortRedditdMap[e.key].toLowerCase()
+						sortRedditdMap[e.key].toLowerCase(),
 					);
 					window.location.href = url.toString();
 				}
@@ -155,7 +155,7 @@ function addEventListeners() {
 	`);
 	// auto-Disable safe search (when performing a search)
 	waitForEl(`#safe-search-toggle[aria-checked=true]`).then((el) =>
-		el.click()
+		el.click(),
 	);
 
 	/*
@@ -163,7 +163,7 @@ function addEventListeners() {
 	*/
 	// remove iframe "Use your google account to sign in to Reddit"(single sign on google)
 	waitForEl("#SHORTCUT_FOCUSABLE_DIV iframe").then((sso) =>
-		isLoggedIn() ? 0 /* do nothing */ : sso.parentNode.remove()
+		isLoggedIn() ? 0 /* do nothing */ : sso.parentNode.remove(),
 	);
 	//Automatic Dark mode
 	function openDropDown(dropDown) {
@@ -184,7 +184,7 @@ function addEventListeners() {
 				//click Dark Mode Btn if it's off
 				if (
 					settingsCaret.parentNode.parentNode.nextSibling.children[0].children[1].getAttribute(
-						"aria-checked"
+						"aria-checked",
 					) === "false"
 				) {
 					settingsCaret.parentNode.parentNode.nextSibling.children[0].click();
@@ -199,7 +199,7 @@ function addEventListeners() {
 	const clickDiscussionSpoiler = () => {
 		if (isLoggedIn()) return;
 		const ray = Array.prototype.slice.call(
-			doc.querySelectorAll('button[tabindex="0"]')
+			doc.querySelectorAll('button[tabindex="0"]'),
 		);
 		ray.forEach((curBtn, i) => {
 			if (curBtn.innerHTML.startsWith("View Entire Discussion"))

@@ -25,7 +25,8 @@ const blacklistJSON = {
 //todo: use blacklistJSON instead of hardcoding
 function checkBlacklisted(e) {
 	const completeBlock = ["www.instagram.com"];
-	if (completeBlock.includes(win.location.hostname) ||
+	if (
+		completeBlock.includes(win.location.hostname) ||
 		(win.location.hostname === "www.youtube.com" &&
 			((e.key === "f" && win.location.pathname === "/watch") ||
 				e.key === "j" ||

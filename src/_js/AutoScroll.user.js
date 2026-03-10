@@ -45,7 +45,7 @@ function getScrollParent(node) {
 		const handleRedditURLChange = () => {
 			if (window.location.href.includes("/comments/")) {
 				const overlayScrollEl = document.getElementById(
-					"overlayScrollContainer"
+					"overlayScrollContainer",
 				);
 				redditMode = document.getElementById("overlayScrollContainer") || 2; // prettier-ignore
 			} else redditMode = 1;
