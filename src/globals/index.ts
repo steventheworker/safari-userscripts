@@ -122,7 +122,7 @@
 		// }
 		if (window !== _win) return; // if (iframe && tarWin === topmost) break all iframe userscripts (w/o globals)
 		window.win = _win;
-		window.doc = win.document;
+		window.doc = win.document; //todo: handle slides/docs.google.com has window.doc (accept cookies errors and google intercepts error shows popup)   —do any sites set window.win!?     ¿¿¿ either stop setting these, or make blacklist ???
 		if (!win.win) win.win = win;
 		if (!win.doc) win.doc = win.document;
 		//define constants

@@ -23,8 +23,8 @@ const jsConsentBannerMatches = {
 
 	// remove accept cookies popup
 	function main() {
-		doc.getElementById("onetrust-consent-sdk")?.remove();
-		doc.getElementsByClassName("js-consent-banner")[0]?.remove();
+		document.getElementById("onetrust-consent-sdk")?.remove();
+		document.getElementsByClassName("js-consent-banner")[0]?.remove();
 	}
 	main();
 	onPageLoaded(() => {

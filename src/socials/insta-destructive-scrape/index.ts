@@ -33,6 +33,15 @@ import { SavedPostsDownloader } from "./SavedPostsDownloader";
 			);
 			return unresolved_post_medias;
 		};
+		(window as any).drop_unresolved_blobs = () => {
+			const unresolved_post_medias = downloader.posts.map((post, i) =>
+				post.media.forEach((item, j) => {
+					if (item.startsWith("blob:"))
+						post.media[j] = item.substring(5);
+				}),
+			);
+			return unresolved_post_medias;
+		};
 
 		// downloader.start(); //comment this out
 	}, 5000);
