@@ -10,7 +10,8 @@
 // ==/UserScript==
 
 function redirectToFreedium() {
-	window.location.href = "https://freedium.cfd/" + window.location.href;
+	window.location.href =
+		"https://freedium-mirror.cfd/" + window.location.href;
 }
 function MediumPage() {
 	const freediumBtn = doc.createElement("button");

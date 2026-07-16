@@ -17,7 +17,7 @@ const DEFAULT_STEPS = 300; //scroll rate for down (j) & up (k)
 //"website": {letter: {exception: "type"}}   --disable specific binding (with exception eg: www.youtube.com)
 const blacklistJSON = {
 	"www.youtube.com": { j: true, k: true, f: { path: "/watch" } },
-	"www.reddit.com": { fSteps: 600, j: true, k: true },
+	// "www.reddit.com": { fSteps: 600, j: true, k: true },
 	"www.twitter.com": { j: true, k: true },
 	"www.google.com": { j: true, k: true },
 };
@@ -45,7 +45,63 @@ function checkBlacklisted(e) {
 	window.addEventListener("keydown", (e) => {
 		if ($isInput(doc.activeElement) || checkBlacklisted(e)) return;
 		const siteSettings = blacklistJSON[win.location.hostname];
-		if (e.key === "j" || e.key === "k" || e.key === "F" || e.key === "f") {
+
+		if (
+			e.key === "j" ||
+			e.key === "k" ||
+			e.key === "F" ||
+			e.key === "f" ||
+			e.key === "g" ||
+			e.key === "G" ||
+			e.key === "{" ||
+			e.key === "}"
+		) {
+			if (e.key === "g" && !e.repeat) {
+				// scroll to top on gg
+				const handleG = () => {
+					window.removeEventListener("keydown", onkeydownHandler);
+					window.scrollTo({ top: 0, behavior: "smooth" });
+				};
+
+				const onkeydownHandler = (event) => {
+					if (event.key === "g") {
+						event.preventDefault();
+						handleG();
+						return false;
+					} else {
+						window.removeEventListener("keydown", onkeydownHandler);
+					}
+				};
+
+				window.addEventListener("keydown", onkeydownHandler);
+				return;
+			}
+
+			if (e.key === "G") {
+				// scroll to bottom
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: "smooth",
+				});
+				return;
+			}
+
+			if (e.key === "{") {
+				window.scrollBy({
+					top: -(siteSettings?.fSteps || DEFAULT_F_STEPS),
+					behavior: "smooth",
+				});
+				return;
+			}
+
+			if (e.key === "}") {
+				window.scrollBy({
+					top: siteSettings?.fSteps || DEFAULT_F_STEPS,
+					behavior: "smooth",
+				});
+				return;
+			}
+
 			win.scroll({
 				left: 0,
 				top:

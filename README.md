@@ -6,11 +6,15 @@ for ```src/<subfolder>/index.ts```
 ```src/_js``` holds raw .user.js files
 
 ### <u>Install</u>
-1. [<u>**quoid/Userscripts extension**</u>](https://itunes.apple.com/us/app/userscripts/id1463298887)
+1. Safari: [<u>**quoid/Userscripts**</u>](https://itunes.apple.com/us/app/userscripts/id1463298887) extension ✅
 
-1. or using <u>**Violentmonkey**</u>: &nbsp; step 1, open globals.user.js in the built-in editor and open the settings tab. Set the position to 1, and "run at" to document-start.
-
-&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; step 2 <u>**OPTIONAL</u> + (Firefox ONLY**): &nbsp; host safari-userscripts/Userscripts  as http://localhost/userscripts (port 80) with any web server
+1. Firefox / Other:
+   2. <u>**Violentmonkey**</u>: &nbsp; step 1, open globals.user.js in the built-in editor and open the settings tab. Set the position to 1, and "run at" to document-start.
+      - <u>**OPTIONAL</u> (Firefox setup**):
+        - host safari-userscripts/Userscripts  as http://localhost/userscripts (port 80) with any web server
+        - mini userscript manager (a userscript manager for your userscript manager)
+          - `script0.user.js` + `script1.user.js` —load directory of userscripts
+          exposed functions: `clearUserScriptCache  &  refreshUserScriptCache loadUserscript, enableUserscript, disableUserscript, logInjectedUserscripts`)
 
 install: ```pnpm install``` (don't forget to approve builds if asked) ```pnpm run build```
 
