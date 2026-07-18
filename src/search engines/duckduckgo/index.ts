@@ -43,14 +43,22 @@ function addEventListeners() {
 	win.addEventListener("keyup", keyup);
 	win.addEventListener("click", click);
 	win.addEventListener("keypress", keypress);
+	win.addEventListener("focusin", onFocusIn);
 }
 
 function keydown(e: KeyboardEvent) {
+	if (e.key.toLowerCase() === "g" && e.shiftKey && e.metaKey) {
+		e.preventDefault();
+		e.stopImmediatePropagation();
+		openQueryInGoogle(searchInput()?.value || "");
+		return;
+	}
 	if ($isInput(doc.activeElement)) {
+		const input = e.target as HTMLInputElement;
 		if (e.key === "Enter" && e.metaKey) {
 			e.preventDefault();
 			e.stopImmediatePropagation();
-			const query = encodeURIComponent((e.target as HTMLInputElement).value);
+			const query = encodeURIComponent(input.value);
 			win.open(`${win.location.origin}/?q=${query}&t=h_`, "_blank");
 		}
 		return;
@@ -170,6 +178,23 @@ let i = 0;
 
 const searchInput = () => doc.querySelector<HTMLInputElement>("#search_form_input");
 const searchBtn = () => doc.querySelector<HTMLButtonElement>('button[type="submit"][aria-label="search"]');
+
+function onFocusIn(e: FocusEvent) {
+	const target = e.target;
+	if (!(target instanceof HTMLInputElement)) return;
+	if (target.id !== "search_form_input") return;
+	setTimeout(() => focusInputToEnd(target), 0);
+}
+
+function focusInputToEnd(input: HTMLInputElement) {
+	const end = input.value.length;
+	input.focus();
+	input.setSelectionRange(end, end);
+}
+
+function openQueryInGoogle(query: string) {
+	win.open(`https://www.google.com/search?q=${encodeURIComponent(query).replace(/%20/g, "+")}`, "_blank");
+}
 
 function findTimeFilterButton() {
 	return Array.from(doc.querySelectorAll('#react-layout [tabindex="0"]')).find((el) => {
