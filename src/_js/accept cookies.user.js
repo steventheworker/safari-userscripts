@@ -8,18 +8,18 @@
 // @match        *://*/*
 // ==/UserScript==
 
-const jsConsentBannerMatches = {
-	// @match        https://apple.stackexchange.com/*
-	// @match        https://unix.stackexchange.com/*
-	// @match        https://askubuntu.com/*
-	// @match        https://stackoverflow.com/*
-	// @match        https://superuser.com/*
-	// @match        https://vi.stackexchange.com
-	//https://vi.stackexchange.com
-};
-
 (function () {
 	"use strict";
+
+	const jsConsentBannerMatches = {
+		// @match        https://apple.stackexchange.com/*
+		// @match        https://unix.stackexchange.com/*
+		// @match        https://askubuntu.com/*
+		// @match        https://stackoverflow.com/*
+		// @match        https://superuser.com/*
+		// @match        https://vi.stackexchange.com
+		//https://vi.stackexchange.com
+	};
 
 	// remove accept cookies popup
 	function main() {

@@ -23,29 +23,64 @@ export function removeSiteFromQuery() {
 	const val = el.value;
 	const ray = val.split("site:");
 	const querySite = (ray[1] || "").split(" ")[0] || "";
-	el.value = el.value.replace("site:" + querySite, "");
+	if (querySite)
+		setSearchInputValue(val.replace("site:" + querySite, "").trim());
 	return querySite;
 }
 
 export function add2query(txt: string) {
 	const el = searchInput();
-	if (el) el.value += txt;
+	if (el)
+		setSearchInputValue((el.value + " " + txt).replace(/\s+/g, " ").trim());
+}
+
+// The DDG search input is a React-controlled component — writing .value
+// directly leaves React's state stale, so the next re-render reverts the
+// input to the previous query. Set the value through the native setter and
+// dispatch an input event so React's onChange keeps its state in sync.
+export function setSearchInputValue(value: string) {
+	const el = searchInput();
+	if (!el) return;
+	const setter = Object.getOwnPropertyDescriptor(
+		HTMLInputElement.prototype,
+		"value",
+	)?.set;
+	if (setter) setter.call(el, value);
+	else el.value = value;
+	el.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+// Submit the current search query the way a real user would: click the search
+// button (its onClick reads the input's DOM value), falling back to dispatching
+// Enter on the input so DDG's own submit handler runs.
+export function submitSearch() {
+	const btn = searchBtn();
+	if (btn) {
+		btn.click();
+		return;
+	}
+	const input = searchInput();
+	if (input) {
+		input.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				key: "Enter",
+				bubbles: true,
+				cancelable: true,
+			}),
+		);
+	}
 }
 
 // search input
 export const searchInput = () =>
-	doc.querySelector<HTMLInputElement>("#search_form_input");
+	doc.querySelector<HTMLInputElement>("#search_form_input") ||
+	doc.querySelector<HTMLInputElement>("#search_form_input_homepage");
 
 export const searchBtn = () =>
-	doc.querySelector<HTMLButtonElement>(
+	doc.querySelector<HTMLElement>(
 		'button[type="submit"][aria-label="search"]',
-	);
-
-export function focusInputToEnd(input: HTMLInputElement) {
-	const end = input.value.length;
-	input.focus();
-	input.setSelectionRange(end, end);
-}
+	) ||
+	doc.querySelector<HTMLElement>("#search_button_homepage");
 
 export function getResultContainer() {
 	return (

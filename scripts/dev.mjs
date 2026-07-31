@@ -110,7 +110,7 @@ async function tryPath(dir, entry) {
 	if (!fs.statSync(full).isDirectory()) return;
 	if (!fs.existsSync(path.join(full, "index.ts"))) {
 		// recurse organizational folders
-		for (const _entry of fs.readdirSync(full)) tryPath(full, _entry);
+		for (const _entry of fs.readdirSync(full)) await tryPath(full, _entry);
 		return;
 	}
 	await buildOne(full);
@@ -122,7 +122,7 @@ async function tryPath(dir, entry) {
 async function main() {
 	fs.mkdirSync(OUT, { recursive: true });
 	for (const entry of fs.readdirSync(SRC)) {
-		tryPath(SRC, entry);
+		await tryPath(SRC, entry);
 		// watch raw .user.js (_js) folders
 		const full = path.join(SRC, entry);
 		if (entry === "_private") {

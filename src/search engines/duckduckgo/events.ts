@@ -4,14 +4,13 @@ import {
 	add2query,
 	findParentResult,
 	findTimeFilterButton,
-	focusInputToEnd,
 	refocusResult,
 	nextResult,
 	openQueryInGoogle,
 	prevResult,
 	removeSiteFromQuery,
-	searchBtn,
 	searchInput,
+	submitSearch,
 	results,
 	setFocusedResultIndex,
 	focusedResultIndex,
@@ -23,7 +22,6 @@ export function addEventListeners() {
 	win.addEventListener("keyup", keyup);
 	win.addEventListener("click", click);
 	win.addEventListener("keypress", keypress);
-	win.addEventListener("focusin", onFocusIn);
 }
 
 function keydown(e: KeyboardEvent) {
@@ -33,7 +31,11 @@ function keydown(e: KeyboardEvent) {
 		openQueryInGoogle(searchInput()?.value || "");
 		return;
 	}
-	if ($isInput(doc.activeElement)) {
+	// Use e.target (the event origin) rather than doc.activeElement: DDG's own
+	// React onKeyDown submits and blurs the input before this window-level
+	// listener runs, so activeElement is no longer the input — and the Enter
+	// handler below would click the focused result, racing the real submit.
+	if ($isInput(e.target as HTMLElement)) {
 		const input = e.target as HTMLInputElement;
 		if (e.key === "Enter" && e.metaKey) {
 			e.preventDefault();
@@ -107,7 +109,7 @@ function keydown(e: KeyboardEvent) {
 
 	if (site_dict[e.key] && removeSiteFromQuery() !== site_dict[e.key]) {
 		add2query(" site:" + site_dict[e.key]);
-		searchBtn()?.click();
+		submitSearch();
 	}
 
 	if (e.key === "I" || e.key === "V" || e.key === "A") {
@@ -139,7 +141,7 @@ function keydown(e: KeyboardEvent) {
 }
 
 function keyup(e: KeyboardEvent) {
-	if ($isInput(doc.activeElement)) return;
+	if ($isInput(e.target as HTMLElement)) return;
 	if (e.key === "Escape") {
 		bod.style.opacity = "0.5";
 		setTimeout(() => (bod.style.opacity = "1"), 333);
@@ -150,7 +152,7 @@ function keypress(e: KeyboardEvent) {
 	if (
 		location.pathname === "/" &&
 		e.key === "I" &&
-		doc.activeElement!.nodeName !== "INPUT"
+		!$isInput(e.target as HTMLElement)
 	) {
 		const images = Array.from(
 			doc.querySelectorAll("#react-duckbar a"),
@@ -163,7 +165,7 @@ function keypress(e: KeyboardEvent) {
 }
 
 function click(e: MouseEvent) {
-	if ($isInput(doc.activeElement)) return;
+	if ($isInput(e.target as HTMLElement)) return;
 	let tarRes = findParentResult(e.target as HTMLElement);
 	if (tarRes && tarRes.classList.contains("focusedResult")) return;
 	if (tarRes) {
@@ -171,11 +173,4 @@ function click(e: MouseEvent) {
 		if (idx >= 0) setFocusedResultIndex(idx);
 		refocusResult();
 	}
-}
-
-function onFocusIn(e: FocusEvent) {
-	const target = e.target;
-	if (!(target instanceof HTMLInputElement)) return;
-	if (target.id !== "search_form_input") return;
-	setTimeout(() => focusInputToEnd(target), 0);
 }
