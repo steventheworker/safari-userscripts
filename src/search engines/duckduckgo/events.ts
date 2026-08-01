@@ -4,6 +4,7 @@ import {
 	add2query,
 	findParentResult,
 	findTimeFilterButton,
+	focusInputToEnd,
 	refocusResult,
 	nextResult,
 	openQueryInGoogle,
@@ -22,6 +23,7 @@ export function addEventListeners() {
 	win.addEventListener("keyup", keyup);
 	win.addEventListener("click", click);
 	win.addEventListener("keypress", keypress);
+	win.addEventListener("focusin", onFocusIn);
 }
 
 function keydown(e: KeyboardEvent) {
@@ -173,4 +175,15 @@ function click(e: MouseEvent) {
 		if (idx >= 0) setFocusedResultIndex(idx);
 		refocusResult();
 	}
+}
+
+// DDG's / shortcut focuses the search input with the whole query selected;
+// move the caret to the end instead (was dropped in 964cc56, reintroducing
+// the regression this fixes). Run after DDG's own focus handling settles.
+function onFocusIn(e: FocusEvent) {
+	const target = e.target;
+	if (!(target instanceof HTMLInputElement)) return;
+	if (target.id !== "search_form_input" && target.id !== "search_form_input_homepage")
+		return;
+	setTimeout(() => focusInputToEnd(target), 0);
 }

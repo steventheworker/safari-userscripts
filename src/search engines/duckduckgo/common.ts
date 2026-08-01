@@ -82,6 +82,12 @@ export const searchBtn = () =>
 	) ||
 	doc.querySelector<HTMLElement>("#search_button_homepage");
 
+export function focusInputToEnd(input: HTMLInputElement) {
+	const end = input.value.length;
+	input.focus();
+	input.setSelectionRange(end, end);
+}
+
 export function getResultContainer() {
 	return (
 		doc.querySelector(
