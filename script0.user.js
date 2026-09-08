@@ -139,6 +139,21 @@ class RegistryScript {
 		}
 	}
 	nonRegexTest(url, pattern) {
+		// Firefox/Violentmonkey can expose a development URL such as
+		// http://localhost:8000/. A portless localhost match is intended to
+		// cover that URL, while an explicitly ported match remains specific.
+		if (/^[^:]+:\/\/localhost\//i.test(pattern)) {
+			try {
+				const parsedURL = new URL(url);
+				if (parsedURL.hostname.toLowerCase() === "localhost" && parsedURL.port) {
+					parsedURL.port = "";
+					url = parsedURL.href;
+				}
+			} catch (_) {
+				// Keep the normal wildcard comparison for non-URL values.
+			}
+		}
+
 		// pattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		// pattern = pattern.replace(/\\\*/g, '.*');
 
