@@ -48,7 +48,7 @@ function toggleInspectElementElement() {
 
 	window.addEventListener("keydown", (e) => {
 		if (
-			(e.key === "`" && e.metaKey) ||
+			(e.key === "`" && e.ctrlKey) ||
 			(e.key === "i" && e.metaKey && e.altKey)
 		) {
 			const w0 = document.body.clientWidth;
